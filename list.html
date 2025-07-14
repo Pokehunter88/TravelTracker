@@ -1,0 +1,650 @@
+<html>
+
+<head>
+  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
+  <link rel="stylesheet" as="style" onload="this.rel='stylesheet'"
+    href="https://fonts.googleapis.com/css2?display=swap&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&amp;family=Space+Grotesk%3Awght%40400%3B500%3B700" />
+
+  <title>Travel Tracker</title>
+  <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <style>
+    #visits-list {
+      max-height: 200px;
+      /* Adjust as needed */
+      overflow-y: auto;
+    }
+
+    .tab-slider {
+      transition: all 0.3s ease-in-out;
+    }
+
+    /* For Webkit-based browsers (Chrome, Safari) */
+    ::-webkit-scrollbar {
+      width: 12px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #161a1d;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background-color: #2e363e;
+      border-radius: 6px;
+    }
+
+    :root {
+      --container-width: 960px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="relative flex min-h-screen flex-col bg-[#161a1d] dark group/design-root"
+    style='--checkbox-tick-svg: url(&apos;data:image/svg+xml,%3csvg viewBox=%270 0 16 16%27 fill=%27rgb(22,26,29)%27 xmlns=%27http://www.w3.org/2000/svg%27%3e%3cpath d=%27M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z%27/%3e%3c/svg%3e&apos;); font-family: "Space Grotesk", "Noto Sans", sans-serif;'>
+    <header
+      class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#2e363e] px-5 py-3 sticky top-0 self-start w-full z-20 bg-[#161a1d]">
+      <div class="flex items-center gap-4 text-white">
+        <div class="size-4">
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M4 42.4379C4 42.4379 14.0962 36.0744 24 41.1692C35.0664 46.8624 44 42.2078 44 42.2078L44 7.01134C44 7.01134 35.068 11.6577 24.0031 5.96913C14.0971 0.876274 4 7.27094 4 7.27094L4 42.4379Z"
+              fill="currentColor"></path>
+          </svg>
+        </div>
+        <a class="text-white text-lg font-bold leading-tight tracking-[-0.015em]" href="/index.html">Travel
+          Tracker</a>
+      </div>
+      <div class="flex flex-1 justify-end gap-5">
+        <div class="flex items-center gap-5">
+          <a class="text-white text-sm font-medium leading-normal" href="/list.html">Countries</a>
+          <a class="text-white text-sm font-medium leading-normal" href="/timeline.html">Timeline</a>
+          <a class="text-white text-sm font-medium leading-normal" href="/wishlist.html">Wishlist</a>
+          <a class="text-white text-sm font-medium leading-normal" href="/map.html">Map</a>
+        </div>
+        <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
+          style='background-image: url("https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg");'>
+        </div>
+      </div>
+    </header>
+    <div class="px-20 flex flex-1 justify-center py-5">
+      <div class="layout-content-container flex flex-col flex-1 max-w-[960px] transition"> <!-- MAIN CONTAINER -->
+        <div class="px-4 py-3">
+          <div class="relative w-full max-w-md mx-auto">
+            <div
+              class="relative bg-[#2e363e00] rounded-full p-1 flex items-center border-solid border border-[#2e363e] p-3">
+              <div class="absolute left-0 w-1/3 h-12 bg-[#2e363e] rounded-full tab-slider" id="main-tab-slider"></div>
+              <button class="relative z-10 w-1/3 text-center text-white text-sm font-medium"
+                onclick="switchTab('countries')">Countries</button>
+              <button class="relative z-10 w-1/3 text-center text-white text-sm font-medium"
+                onclick="switchTab('cities')">Cities</button>
+              <button class="relative z-10 w-1/3 text-center text-white text-sm font-medium"
+                onclick="switchTab('regions')">Regions</button>
+            </div>
+          </div>
+        </div>
+        <div class="px-4 py-3">
+          <label class="flex flex-col min-w-50 h-12 w-full">
+            <div class="flex w-full flex-1 items-stretch rounded-xl h-full">
+              <div
+                class="text-[#a1adba] flex border-none bg-[#2e363e] items-center justify-center pl-4 rounded-l-xl border-r-0"
+                data-icon="MagnifyingGlass" data-size="24px" data-weight="regular">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor"
+                  viewBox="0 0 256 256">
+                  <path
+                    d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z">
+                  </path>
+                </svg>
+              </div>
+              <input placeholder="Search"
+                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-white focus:outline-0 focus:ring-0 border-none bg-[#2e363e] focus:border-none h-full placeholder:text-[#a1adba] px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal"
+                value="" onkeyup="search()" id="search-input" />
+            </div>
+          </label>
+        </div>
+
+        <!-- START OF LIST -->
+        <div id="countries-content">
+          <h3
+            class="text-white text-2xl font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4 place-self-center border-b border-solid border-b-[#2e363e]">
+            Africa</h3>
+          <div class="grid grid-cols-1 gap-1 px-2 md:grid-cols-2" id="af">
+          </div>
+          <h3
+            class="text-white text-2xl font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4 place-self-center border-b border-solid border-b-[#2e363e]">
+            Antarctica</h3>
+          <div class="grid grid-cols-1 gap-1 px-2 md:grid-cols-2" id="an">
+          </div>
+          <h3
+            class="text-white text-2xl font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4 place-self-center border-b border-solid border-b-[#2e363e]">
+            Asia</h3>
+          <div class="grid grid-cols-1 gap-1 px-2 md:grid-cols-2" id="as">
+          </div>
+          <h3
+            class="text-white text-2xl font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4 place-self-center border-b border-solid border-b-[#2e363e]">
+            Europe</h3>
+          <div class="grid grid-cols-1 gap-1 px-2 md:grid-cols-2" id="eu">
+          </div>
+          <h3
+            class="text-white text-2xl font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4 place-self-center border-b border-solid border-b-[#2e363e]">
+            North America</h3>
+          <div class="grid grid-cols-1 gap-1 px-2 md:grid-cols-2" id="na">
+          </div>
+          <h3
+            class="text-white text-2xl font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4 place-self-center border-b border-solid border-b-[#2e363e]">
+            Oceana</h3>
+          <div class="grid grid-cols-1 gap-1 px-2 md:grid-cols-2" id="oc">
+          </div>
+          <h3
+            class="text-white text-2xl font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4 place-self-center border-b border-solid border-b-[#2e363e]">
+            South America</h3>
+          <div class="grid grid-cols-1 gap-1 px-2 md:grid-cols-2" id="sa">
+          </div>
+        </div>
+        <div id="cities-content" class="hidden">
+          <div class="grid grid-cols-1 gap-1 px-2 md:grid-cols-2" id="cities">
+          </div>
+        </div>
+        <div id="regions-content" class="hidden">
+          <p class="text-white">Regions content goes here.</p>
+        </div>
+
+        <!-- Modal -->
+        <div id="country-modal"
+          class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-30">
+          <div class="bg-[#161a1d] p-8 rounded-lg shadow-lg text-white w-1/3">
+            <h2 id="modal-country-name" class="text-2xl font-bold mb-4"></h2>
+            <div class="flex flex-col gap-4">
+              <div class="px-4 py-3">
+                <div class="relative w-full max-w-md mx-auto">
+                  <div
+                    class="relative bg-[#2e363e00] rounded-full p-1 flex items-center border-solid border border-[#2e363e] p-3">
+                    <div class="absolute left-0 w-1/2 h-12 bg-[#2e363e] rounded-full tab-slider" id="type-tab-slider">
+                    </div>
+                    <button class="relative z-10 w-1/2 text-center text-white text-sm font-medium"
+                      onclick="switchTab('visit')">Visit</button>
+                    <button class="relative z-10 w-1/2 text-center text-white text-sm font-medium"
+                      onclick="switchTab('wishlist')">Wishlist</button>
+                  </div>
+                </div>
+              </div>
+              <div id="visit-content">
+                <div class="flex justify-center">
+                  <button id="add-to-visited"
+                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded place-self-center transition-all duration-300 ease-in-out">Add
+                    Visit</button>
+                </div>
+
+                <ul id="visits-list" class="text-white"></ul>
+              </div>
+              <div id="wishlist-content" class="hidden">
+                <button id="add-to-wishlist"
+                  class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Add to
+                  Wishlist</button>
+              </div>
+              <!-- <div id="visited-dates" class="">
+                  <label for="start-date">Start Date:</label>
+                  <input type="date" id="start-date" class="bg-gray-700 text-white rounded p-2">
+                  <label for="end-date">End Date:</label>
+                  <input type="date" id="end-date" class="bg-gray-700 text-white rounded p-2">
+                </div> -->
+            </div>
+            <div class="flex justify-end mt-6">
+              <button id="modal-close"
+                class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="layout-content-container flex flex-col flex-1 overflow-hidden transition sticky top-20 self-start"
+        style="max-width: var(--container-width); transition: max-width 0.5s ease-in-out;">
+        <button
+          class="text-white text-base font-bold text-[20px] leading-normal hover:bg-[#4c5967] bg-[#2e363e] p-2 text-center rounded-full transition"
+          onclick="document.querySelector(':root').style.setProperty('--container-width', '0px');">
+          Close
+        </button>
+        <div class="flex px-4 py-3">
+          <div class="w-full bg-center bg-no-repeat aspect-[6/2] bg-cover rounded-xl object-cover bg-[#161a1d]"
+            id="map">
+          </div>
+        </div>
+        <div class="flex flex-wrap justify-between gap-3 p-4">
+          <div class="flex flex-1 min-w-72 flex-col gap-3">
+            <div class="flex items-center justify-between">
+              <p class="text-white tracking-light text-[32px] font-bold leading-tight" id="country-name">Name</p>
+              <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink"
+                width="60" height="60" x="0" y="0" viewBox="4 4 16 16" style="enable-background:new 0 0 512 512"
+                xml:space="preserve" class="opacity-100" id="checkmark">
+                <g>
+                  <path
+                    d="M18.7 7.2c-.4-.4-1-.4-1.4 0l-7.5 7.5-3.1-3.1c-.4-.4-1-.4-1.4 0s-.4 1 0 1.4l3.8 3.8c.2.2.4.3.7.3s.5-.1.7-.3l8.2-8.2c.4-.4.4-1 0-1.4z"
+                    fill="#FFFFFF" opacity="1" data-original="#000000" class=""></path>
+                </g>
+              </svg>
+            </div>
+            <p class="text-[#92adc9] text-sm font-normal leading-normal" id="country-capital">Capital</p>
+          </div>
+        </div>
+        <!-- <h3 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Visited</h3> -->
+        <div class="flex justify-center">
+          <div class="flex flex-1 gap-3 flex-wrap px-4 py-3 max-w-[480px] justify-center">
+            <button
+              class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 hover:bg-[#4c5967] bg-[#2e363e] transition text-white text-sm font-bold leading-normal tracking-[0.015em] grow"
+              id="visit-button">
+              <span class="truncate">Manage Visits</span>
+            </button>
+            <!-- <button
+                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#233648] text-white text-sm font-bold leading-normal tracking-[0.015em] grow"
+                id="wishlist-button">
+                <span class="truncate">Add to wishlist</span>
+              </button> -->
+          </div>
+        </div>
+        <h3 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">About</h3>
+        <div class="p-4 grid grid-cols-[20%_1fr] gap-x-6">
+          <div class="col-span-2 grid grid-cols-subgrid border-t border-t-[#324d67] py-5">
+            <p class="text-[#92adc9] text-sm font-normal leading-normal">Capital</p>
+            <p class="text-white text-sm font-normal leading-normal" id="country-capital2">Capital</p>
+          </div>
+          <div class="col-span-2 grid grid-cols-subgrid border-t border-t-[#324d67] py-5">
+            <p class="text-[#92adc9] text-sm font-normal leading-normal">Population</p>
+            <p class="text-white text-sm font-normal leading-normal" id="country-population">Population</p>
+          </div>
+          <div class="col-span-2 grid grid-cols-subgrid border-t border-t-[#324d67] py-5">
+            <p class="text-[#92adc9] text-sm font-normal leading-normal">Currency</p>
+            <p class="text-white text-sm font-normal leading-normal" id="country-currency">Currency</p>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+          const slider = document.getElementById('main-tab-slider');
+          const countriesContent = document.getElementById('countries-content');
+          const citiesContent = document.getElementById('cities-content');
+          const regionsContent = document.getElementById('regions-content');
+
+          const slider2 = document.getElementById('type-tab-slider');
+          const visitContent = document.getElementById('visit-content');
+          const wishlistContent = document.getElementById('wishlist-content');
+
+          let countryInfoMap = new Map();
+          let cities15000Map = new Map();
+
+          async function loadData() {
+            try {
+              const countryInfoResponse = await fetch('countryInfo.txt');
+              const countryInfoText = await countryInfoResponse.text();
+              countryInfoText.split('\n').forEach(line => {
+                if (line.startsWith('#') || line.trim() === '') {
+                  return;
+                }
+                const columns = line.split('\t');
+                if (columns.length > 4) {
+                  const countryCode = columns[0].toLowerCase();
+                  const capital = columns[5];
+                  countryInfoMap.set(countryCode, { capital: capital, population: columns[7], currency: columns[11] });
+                }
+              });
+
+              const cities15000Response = await fetch('cities15000.txt');
+              const cities15000Text = await cities15000Response.text();
+              cities15000Text.split('\n').forEach(line => {
+                if (line.startsWith('#') || line.trim() === '') {
+                  return;
+                }
+                const columns = line.split('\t');
+                if (columns.length > 4) {
+                  const cityName = columns[2];
+                  const latitude = parseFloat(columns[4]);
+                  const longitude = parseFloat(columns[5]);
+                  cities15000Map.set(cityName + columns[8], { latitude: latitude, longitude: longitude });
+                }
+              });
+            } catch (error) {
+              console.error('Error loading data:', error);
+            }
+          }
+
+          function switchTab(tab) {
+            if (tab === 'countries') {
+              slider.style.transform = 'translateX(0)';
+              countriesContent.classList.remove('hidden');
+              citiesContent.classList.add('hidden');
+              regionsContent.classList.add('hidden');
+            } else if (tab === 'cities') {
+              slider.style.transform = 'translateX(100%)';
+              countriesContent.classList.add('hidden');
+              citiesContent.classList.remove('hidden');
+              regionsContent.classList.add('hidden');
+            } else if (tab === 'regions') {
+              slider.style.transform = 'translateX(200%)';
+              countriesContent.classList.add('hidden');
+              citiesContent.classList.add('hidden');
+              regionsContent.classList.remove('hidden');
+            } else if (tab === 'visit') {
+              slider2.style.transform = 'translateX(0)';
+              visitContent.classList.remove('hidden');
+              wishlistContent.classList.add('hidden');
+            } else if (tab === 'wishlist') {
+              slider2.style.transform = 'translateX(100%)';
+              visitContent.classList.add('hidden');
+              wishlistContent.classList.remove('hidden');
+            }
+          }
+
+          window.switchTab = switchTab;
+
+          function search() {
+            const input = document.getElementById('search-input');
+            const filter = input.value.toUpperCase();
+            const lists = document.querySelectorAll('#af, #an, #as, #eu, #na, #oc, #sa');
+
+            lists.forEach(list => {
+              const items = list.getElementsByTagName('label');
+              let visibleItems = 0;
+              for (let i = 0; i < items.length; i++) {
+                const p = items[i].getElementsByTagName('p')[0];
+                const txtValue = p.textContent || p.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                  items[i].style.display = "";
+                  visibleItems++;
+                } else {
+                  items[i].style.display = "none";
+                }
+              }
+
+              const title = list.previousElementSibling;
+              if (title && title.tagName === 'H3') {
+                title.style.display = visibleItems > 0 ? "" : "none";
+              }
+            });
+          }
+
+          window.search = search;
+
+          function createItem(name, flag, continent, visited) {
+            const newNode = document.createElement("label");
+
+            if (visited) {
+              newNode.className = "flex justify-between items-center cursor-pointer rounded-lg px-3 py-3 transition-colors hover:bg-[#00FF0083] bg-[#00FF0036]";
+            }
+            else {
+              newNode.className = "flex justify-between items-center cursor-pointer rounded-lg px-3 py-3 transition-colors hover:bg-[#2e363e]";
+            }
+
+            newNode.id = "country-" + flag;
+
+            const leftContainer = document.createElement("div");
+            leftContainer.className = "flex items-center gap-x-3";
+
+            const text = document.createElement("p");
+
+            text.className = "text-white text-base font-normal leading-normal peer-checked:text-[#dbe5ef]";
+            text.textContent = name;
+
+            const img = document.createElement("img");
+
+            img.className = "w-8 rounded"
+            img.src = `https://flagcdn.com/${flag}.svg`
+
+            leftContainer.append(img);
+            leftContainer.append(text);
+
+            // const arrow = document.createElement("p");
+            // arrow.className = "text-white text-base font-bold text-[20px] leading-normal hover:bg-[#4c5967] p-2 w-10 text-center rounded-full";
+            // arrow.innerHTML = "&gt;";
+
+            newNode.append(leftContainer);
+            // newNode.append(arrow);
+
+            newNode.addEventListener('click', () => {
+              // openModal(name, flag);
+
+              openCountry(name, flag);
+            });
+
+            document.getElementById(continent).append(newNode);
+          }
+
+          let map;
+          let currentCountry = "";
+          let layer;
+
+          function countryStyle(feature) {
+            // console.log(feature.properties);
+            const isoCode = feature.properties["ISO_A2_EH"];
+            return {
+              fillColor: currentCountry === isoCode.toLowerCase() ? '#FFFFFF' : '#2e363e',
+              weight: 3,
+              color: currentCountry === isoCode.toLowerCase() ? '#FFFFFF' : '#2e363e',
+              fillOpacity: 1
+            };
+          }
+
+          map = L.map('map', {
+            zoomControl: false,
+            dragging: false,
+            touchZoom: false,
+            doubleClickZoom: false,
+            scrollWheelZoom: false,
+            boxZoom: false,
+            keyboard: false,
+            tap: false,
+            attributionControl: false
+          }).setView([0, 0], 5);
+
+          // helper to (re)load and draw the countries
+          function loadCountries() {
+            // fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson')
+            fetch('https://raw.githubusercontent.com/nvkelso/natural-earth-vector/refs/heads/master/geojson/ne_50m_admin_0_countries.geojson')
+              .then(res => res.json())
+              .then(data => {
+                // if we've already drawn it once, remove it
+                if (layer) {
+                  map.removeLayer(layer);
+                }
+                // draw it again
+                layer = L.geoJSON(data, {
+                  style: countryStyle,
+                  // onEachFeature: onEachCountry
+                }).addTo(map);
+              });
+          }
+
+          loadCountries();
+
+          function updateCheckmark(country) {
+            const saveData = getSaveData();
+            const countryVisits = saveData.countryVisits.filter(visit => visit.country === country);
+
+            if (countryVisits.length > 0) {
+              document.getElementById('checkmark').classList.remove("opacity-0");
+              document.getElementById('checkmark').classList.add("opacity-100");
+            } else {
+              document.getElementById('checkmark').classList.remove("opacity-100");
+              document.getElementById('checkmark').classList.add("opacity-0");
+            }
+          }
+
+          function openCountry(name, flag) {
+            if (document.getElementById('country-name').textContent === name && document.querySelector(':root').style.getPropertyValue('--container-width') === "960px") {
+              document.querySelector(':root').style.setProperty('--container-width', '0px');
+            } else {
+              document.querySelector(':root').style.setProperty('--container-width', '960px');
+
+              document.getElementById('country-name').textContent = name;
+              document.getElementById('country-name').name = flag;
+
+              updateCheckmark(flag);
+
+              currentCountry = flag;
+              // loadCountries()
+
+              const countryData = countryInfoMap.get(flag);
+              document.getElementById('country-capital').textContent = countryData.capital;
+
+
+              document.getElementById('country-capital2').textContent = countryData.capital;
+              document.getElementById('country-population').textContent = countryData.population;
+              document.getElementById('country-currency').textContent = countryData.currency;
+
+              // if (countryData && countryData.capital) {
+              //   document.getElementById('country-capital').textContent = countryData.capital;
+              //   const cityData = cities15000Map.get(countryData.capital + flag.toUpperCase());
+              //   if (cityData) {
+              //     // console.log(`Capital city ${countryData.capital} ${cityData.latitude} ${cityData.longitude} found in cities15000.txt`);
+              //     // map.setView([cityData.latitude, cityData.longitude], 2);
+              //   } else {
+              //     console.error(`Capital city ${countryData.capital} not found in cities15000.txt`);
+              //     map.setView([0, 0], 1);
+              //   }
+              // } else {
+              //   console.warn(`Country data for ${flag} not found in countryInfo.txt`);
+              //   map.setView([0, 0], 0);
+              // }
+
+              layer.eachLayer(function (currentLayer) {
+                const options = countryStyle(currentLayer.feature);
+
+                currentLayer.options.fillColor = options.fillColor;
+                currentLayer.options.color = options.color;
+
+                currentLayer.setStyle(undefined);
+                if (currentLayer.feature.properties.ISO_A2_EH === flag.toUpperCase()) {
+                  map.fitBounds(currentLayer.getBounds());
+                }
+              });
+            }
+          }
+
+          function openModal(countryName, countryCode) {
+            slider2.style.transform = 'translateX(0)';
+            visitContent.classList.remove('hidden');
+            wishlistContent.classList.add('hidden');
+
+            const modal = document.getElementById('country-modal');
+            const modalCountryName = document.getElementById('modal-country-name');
+            const visitsList = document.getElementById('visits-list');
+            modalCountryName.textContent = countryName;
+            modalCountryName.name = countryCode;
+
+            visitsList.innerHTML = '';
+
+            const saveData = getSaveData();
+            const countryVisits = saveData.countryVisits.filter(visit => visit.country === countryCode);
+
+            countryVisits.forEach((visit, index) => {
+              const listItem = document.createElement('li');
+              listItem.className = 'flex justify-between items-center p-2 border-b border-gray-700';
+              // const textNode = document.createTextNode(`From: ${visit.from || 'N/A'}, To: ${visit.to || 'N/A'}`);
+              const textNode = document.createTextNode("Visited");
+              listItem.appendChild(textNode);
+
+              const removeButton = document.createElement('button');
+              removeButton.textContent = 'Remove';
+              removeButton.className = 'ml-4 bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded transition-all duration-300 ease-in-out transform hover:scale-105';
+              removeButton.onclick = () => {
+                saveData.countryVisits.splice(saveData.countryVisits.indexOf(visit), 1);
+
+                if (saveData.countryVisits.filter(visit => visit.country === countryCode).length == 0) {
+                  document.getElementById("country-" + document.getElementById('modal-country-name').name).className = "flex cursor-pointer items-center gap-x-3 rounded-lg px-3 py-3 transition-colors hover:bg-[#2e363e]";
+                }
+
+                localStorage.setItem('saveData', JSON.stringify(saveData));
+                openModal(countryName, countryCode);
+                updateCheckmark(countryCode);
+              };
+
+              listItem.appendChild(removeButton);
+              visitsList.appendChild(listItem);
+            });
+
+            modal.classList.remove('hidden');
+          }
+
+          function closeModal() {
+            const modal = document.getElementById('country-modal');
+            modal.classList.add('hidden');
+          }
+
+          function getSaveData() {
+            try {
+              return JSON.parse(localStorage.getItem("saveData") ?? "invalid");
+            } catch (e) {
+              return { countryVisits: [], countryWishlist: {} };
+            }
+          }
+
+          let visitedCountries = [];
+
+          function getCountries() {
+            const saveData = getSaveData();
+
+            visitedCountries = [];
+
+            for (let i = 0; i < saveData.countryVisits.length; i++) {
+              visitedCountries.push(saveData.countryVisits[i].country);
+            }
+          }
+
+          function addCountries() {
+            fetch('countryInfo.txt')
+              .then(response => response.text())
+              .then(data => {
+                const lines = data.split('\n');
+                lines.forEach(line => {
+                  if (line.startsWith('#') || line.trim() === '') {
+                    return;
+                  }
+                  const columns = line.split('	');
+                  if (columns.length > 4) {
+                    const countryCode = columns[0].toLowerCase();
+                    const countryName = columns[4];
+                    createItem(countryName, countryCode, columns[8].toLowerCase(), visitedCountries.includes(countryCode));
+                  }
+                });
+              });
+          }
+
+          // document.querySelector(':root').style.setProperty('--container-width', '0px');
+          await loadData();
+          getCountries();
+
+          document.getElementById('modal-close').addEventListener('click', closeModal);
+          document.getElementById('add-to-visited').addEventListener('click', () => {
+            const saveData = getSaveData();
+
+            console.log(saveData);
+
+            saveData.countryVisits.push({ country: document.getElementById('modal-country-name').name, from: null, to: null })
+
+            localStorage.setItem("saveData", JSON.stringify(saveData));
+
+            document.getElementById("country-" + document.getElementById('modal-country-name').name).className = "flex cursor-pointer items-center gap-x-3 rounded-lg px-3 py-3 transition-colors hover:bg-[#00FF0083] bg-[#00FF0036]";
+
+            openModal(document.getElementById('modal-country-name').textContent, document.getElementById('modal-country-name').name);
+
+            getCountries();
+
+            document.getElementById('checkmark').classList.remove("opacity-0");
+            document.getElementById('checkmark').classList.add("opacity-100");
+          });
+
+          document.getElementById('visit-button').addEventListener('click', () => {
+            openModal(document.getElementById('country-name').textContent, document.getElementById('country-name').name);
+          });
+
+          addCountries();
+        });
+      </script>
+    </div>
+  </div>
+</body>
+
+</html>

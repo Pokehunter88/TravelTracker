@@ -1,0 +1,159 @@
+<html>
+
+<head>
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
+    <link rel="stylesheet" as="style" onload="this.rel='stylesheet'"
+        href="https://fonts.googleapis.com/css2?display=swap&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&amp;family=Space+Grotesk%3Awght%40400%3B500%3B700" />
+
+    <title>Travel Tracker</title>
+    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+
+<body>
+    <div class="relative flex size-full min-h-screen flex-col bg-[#161a1d] dark group/design-root overflow-x-hidden"
+        style='--checkbox-tick-svg: url(&apos;data:image/svg+xml,%3csvg viewBox=%270 0 16 16%27 fill=%27rgb(22,26,29)%27 xmlns=%27http://www.w3.org/2000/svg%27%3e%3cpath d=%27M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z%27/%3e%3c/svg%3e&apos;); font-family: "Space Grotesk", "Noto Sans", sans-serif;'>
+        <div class="layout-container flex h-full grow flex-col">
+            <header
+                class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#2e363e] px-5 py-3">
+                <div class="flex items-center gap-4 text-white">
+                    <div class="size-4">
+                        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M4 42.4379C4 42.4379 14.0962 36.0744 24 41.1692C35.0664 46.8624 44 42.2078 44 42.2078L44 7.01134C44 7.01134 35.068 11.6577 24.0031 5.96913C14.0971 0.876274 4 7.27094 4 7.27094L4 42.4379Z"
+                                fill="currentColor"></path>
+                        </svg>
+                    </div>
+                    <a class="text-white text-lg font-bold leading-tight tracking-[-0.015em]" href="/index.html">Travel
+                        Tracker</a>
+                </div>
+                <div class="flex flex-1 justify-end gap-5">
+                    <div class="flex items-center gap-5">
+                        <a class="text-white text-sm font-medium leading-normal" href="/list.html">Countries</a>
+                        <a class="text-white text-sm font-medium leading-normal" href="/timeline.html">Timeline</a>
+                        <a class="text-white text-sm font-medium leading-normal" href="/wishlist.html">Wishlist</a>
+                        <a class="text-white text-sm font-medium leading-normal" href="/map.html">Map</a>
+                    </div>
+                    <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
+                        style='background-image: url("https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg");'>
+                    </div>
+                </div>
+            </header>
+            <div class="px-20 flex flex-1 justify-center py-5">
+                <div class="layout-content-container flex flex-col flex-1">
+                    <!-- <div class="px-4 py-3">
+                        <label class="flex flex-col min-w-50 h-12 w-full">
+                            <div class="flex w-full flex-1 items-stretch rounded-xl h-full">
+                                <div class="text-[#a1adba] flex border-none bg-[#2e363e] items-center justify-center pl-4 rounded-l-xl border-r-0"
+                                    data-icon="MagnifyingGlass" data-size="24px" data-weight="regular">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px"
+                                        fill="currentColor" viewBox="0 0 256 256">
+                                        <path
+                                            d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <input placeholder="Search for a country"
+                                    class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-white focus:outline-0 focus:ring-0 border-none bg-[#2e363e] focus:border-none h-full placeholder:text-[#a1adba] px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal"
+                                    value="" onkeyup="search()" id="search-input" />
+                            </div>
+                        </label>
+                    </div> -->
+
+                    <!-- START OF LIST -->
+
+                    <!-- <h3
+                        class="text-white text-2xl font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4 place-self-center border-b border-solid border-b-[#2e363e]">
+                        Map</h3> -->
+                    <div id="map" class="h-full v-full bg-[#161a1d]"></div>
+
+                    <script>
+                        function getSaveData() {
+                            try {
+                                return JSON.parse(localStorage.getItem("saveData"));
+                            } catch (e) {
+                                return { countryVisits: [], countryWishlist: {} };
+                            }
+                        }
+
+                        // Example visited countries using ISO Alpha-2 codes
+                        const visitedCountries = []; // ← change as needed
+
+                        const saveData = getSaveData();
+
+                        for (let i = 0; i < saveData.countryVisits.length; i++) {
+                            visitedCountries.push(saveData.countryVisits[i].country.toUpperCase());
+                        }
+
+                        console.log(visitedCountries);
+
+                        // Style function: color visited countries green, others gray
+                        function countryStyle(feature) {
+                            const isoCode = feature.properties["ISO_A2_EH"];
+                            return {
+                                fillColor: visitedCountries.includes(isoCode) ? '#FFFFFF' : '#2e363e',
+                                weight: 3,
+                                color: visitedCountries.includes(isoCode) ? '#FFFFFF' : '#2e363e',
+                                fillOpacity: 1
+                            };
+                        }
+
+                        function onEachCountry(feature, layer) {
+                            layer.on({
+                                mouseover: (e) => {
+                                    const layer = e.target;
+                                    layer.setStyle({
+                                        fillColor: '#FFFFFF',
+                                        color: '#FFFFFF',
+                                    });
+                                    // You now know which country is hovered:
+                                    console.log('Hovering over:', feature.properties.ADMIN);
+                                },
+                                mouseout: (e) => {
+                                    const isoCode = feature.properties["ISO3166-1-Alpha-2"];
+                                    const layer = e.target;
+                                    layer.setStyle({
+                                        fillColor: visitedCountries.includes(isoCode) ? '#FFFFFF' : '#2e363e',
+                                        color: visitedCountries.includes(isoCode) ? '#FFFFFF' : '#2e363e',
+                                    });
+                                },
+                                click: (e) => {
+                                    // optional: click to toggle visited
+                                }
+                            });
+                        }
+
+                        // Create Leaflet map
+                        const map = L.map('map', {
+                            zoomControl: false,
+                            // dragging: false,
+                            touchZoom: false,
+                            doubleClickZoom: false,
+                            // scrollWheelZoom: false,
+                            boxZoom: false,
+                            keyboard: false,
+                            tap: false,
+                            attributionControl: false
+                        }).setView([0, 0], 1);
+
+                        // Load country GeoJSON data
+                        fetch('https://raw.githubusercontent.com/nvkelso/natural-earth-vector/refs/heads/master/geojson/ne_50m_admin_0_countries.geojson')
+                            .then(res => res.json())
+                            .then(data => {
+                                L.geoJSON(data, {
+                                    style: countryStyle,
+                                    // onEachFeature: onEachCountry
+                                }).addTo(map);
+                            });
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
