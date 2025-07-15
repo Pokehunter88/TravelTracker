@@ -1,6 +1,7 @@
 <html>
 
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
     <link rel="stylesheet" as="style" onload="this.rel='stylesheet'"
         href="https://fonts.googleapis.com/css2?display=swap&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&amp;family=Space+Grotesk%3Awght%40400%3B500%3B700" />
@@ -32,7 +33,8 @@
                         Tracker</a>
                 </div>
                 <div class="flex flex-1 justify-end gap-5">
-                    <div class="flex items-center gap-5">
+                    <div
+                        class="grid grid-cols-2 grid-rows-2 px-2 md:grid-cols-4 md:grid-rows-1 items-center gap-x-5 gap-y-1">
                         <a class="text-white text-sm font-medium leading-normal" href="/list.html">Countries</a>
                         <a class="text-white text-sm font-medium leading-normal" href="/timeline.html">Timeline</a>
                         <a class="text-white text-sm font-medium leading-normal" href="/wishlist.html">Wishlist</a>
@@ -152,7 +154,7 @@
                         const map = L.map('map', {
                             zoomControl: false,
                             // dragging: false,
-                            touchZoom: false,
+                            // touchZoom: false,
                             doubleClickZoom: false,
                             // scrollWheelZoom: false,
                             boxZoom: false,
