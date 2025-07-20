@@ -104,6 +104,16 @@
                             };
                         }
 
+                        function countryStyleCity(feature) {
+                            const isoCode = feature.properties["ISO_A2_EH"];
+                            return {
+                                fillColor: visitedCountries.includes(isoCode) ? '#FFFFFF' : '#FF0000',
+                                weight: 3,
+                                color: visitedCountries.includes(isoCode) ? '#FFFFFF' : '#FF0000',
+                                fillOpacity: 1
+                            };
+                        }
+
                         function onEachCountry(feature, layer) {
                             layer.on({
                                 mouseover: (e) => {
@@ -131,11 +141,11 @@
 
                         // Create Leaflet map
                         const map = L.map('map', {
-                            zoomControl: false,
                             // dragging: false,
-                            touchZoom: false,
-                            doubleClickZoom: false,
                             // scrollWheelZoom: false,
+                            // touchZoom: false,
+                            zoomControl: false,
+                            doubleClickZoom: false,
                             boxZoom: false,
                             keyboard: false,
                             tap: false,
@@ -150,6 +160,14 @@
                                     style: countryStyle,
                                     // onEachFeature: onEachCountry
                                 }).addTo(map);
+                                // fetch('https://raw.githubusercontent.com/martynafford/natural-earth-geojson/refs/heads/master/50m/cultural/ne_50m_populated_places.json')
+                                //     .then(res => res.json())
+                                //     .then(data => {
+                                //         L.geoJSON(data, {
+                                //             style: countryStyleCity,
+                                //             // onEachFeature: onEachCountry
+                                //         }).addTo(map);
+                                //     });
                             });
                     </script>
                 </div>
