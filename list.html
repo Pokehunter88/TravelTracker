@@ -81,6 +81,14 @@
         left: calc(960px - var(--container-width));
       }
     }
+
+    .calendar {
+      position: absolute;
+      left: 50vw;
+      top: 50vh;
+      transform: translate(-50%, -50%);
+      z-index: 30;
+    }
   </style>
 </head>
 
@@ -216,28 +224,92 @@
               <div id="visit-content">
                 <div class="flex justify-center">
                   <button id="add-to-visited"
-                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded place-self-center transition-all duration-300 ease-in-out">Add
+                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 mb-5 rounded place-self-center transition-all duration-300 ease-in-out">Add
                     Visit</button>
+                </div>
+
+                <div id="visited-dates" class="">
+                  <label for="start-date">Start Date: </label>
+                  <input type="date" id="start-date" class="bg-gray-700 text-white rounded p-2 ml-3">
+                  <div class="mb-5"></div>
+                  <label for="end-date">End Date: </label>
+                  <input type="date" id="end-date" class="bg-gray-700 text-white rounded p-2 ml-3">
                 </div>
 
                 <ul id="visits-list" class="text-white"></ul>
               </div>
               <div id="wishlist-content" class="hidden">
-                <button id="add-to-wishlist"
-                  class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Add to
-                  Wishlist</button>
+                <div class="flex justify-center">
+                  <button id="add-to-wishlist"
+                    class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded place-self-center transition-all duration-300 ease-in-out">Add
+                    to
+                    Wishlist</button>
+                </div>
               </div>
-              <!-- <div id="visited-dates" class="">
-                  <label for="start-date">Start Date:</label>
-                  <input type="date" id="start-date" class="bg-gray-700 text-white rounded p-2">
-                  <label for="end-date">End Date:</label>
-                  <input type="date" id="end-date" class="bg-gray-700 text-white rounded p-2">
-                </div> -->
             </div>
             <div class="flex justify-end mt-6">
               <button id="modal-close"
-                class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Close</button>
+                class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition">Close</button>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="flex flex-wrap items-center justify-center gap-6 p-4 bg-[#1c2125] rounded-lg text-white calendar hidden">
+        <div class="flex min-w-72 max-w-[336px] flex-1 flex-col gap-0.5">
+          <div class="flex items-center p-1 justify-between calendar-header">
+            <button data-action="prev">
+              <div
+                class="text-white flex size-10 items-center justify-center hover:bg-[#4d5b66] transition rounded-full"
+                data-icon="CaretLeft" data-size="18px" data-weight="regular">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" fill="currentColor"
+                  viewBox="0 0 256 256">
+                  <path
+                    d="M165.66,202.34a8,8,0,0,1-11.32,11.32l-80-80a8,8,0,0,1,0-11.32l80-80a8,8,0,0,1,11.32,11.32L91.31,128Z">
+                  </path>
+                </svg>
+              </div>
+            </button>
+            <p class="text-white text-base font-bold leading-tight flex-1 text-center month-year">July 2024
+            </p>
+            <button data-action="next">
+              <div
+                class="text-white flex size-10 items-center justify-center hover:bg-[#4d5b66] transition rounded-full"
+                data-icon="CaretRight" data-size="18px" data-weight="regular">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" fill="currentColor"
+                  viewBox="0 0 256 256">
+                  <path
+                    d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z">
+                  </path>
+                </svg>
+              </div>
+            </button>
+          </div>
+          <div class="grid grid-cols-7">
+            <p
+              class="text-white text-[13px] font-bold leading-normal tracking-[0.015em] flex h-12 w-full items-center justify-center pb-0.5">
+              S</p>
+            <p
+              class="text-white text-[13px] font-bold leading-normal tracking-[0.015em] flex h-12 w-full items-center justify-center pb-0.5">
+              M</p>
+            <p
+              class="text-white text-[13px] font-bold leading-normal tracking-[0.015em] flex h-12 w-full items-center justify-center pb-0.5">
+              T</p>
+            <p
+              class="text-white text-[13px] font-bold leading-normal tracking-[0.015em] flex h-12 w-full items-center justify-center pb-0.5">
+              W</p>
+            <p
+              class="text-white text-[13px] font-bold leading-normal tracking-[0.015em] flex h-12 w-full items-center justify-center pb-0.5">
+              T</p>
+            <p
+              class="text-white text-[13px] font-bold leading-normal tracking-[0.015em] flex h-12 w-full items-center justify-center pb-0.5">
+              F</p>
+            <p
+              class="text-white text-[13px] font-bold leading-normal tracking-[0.015em] flex h-12 w-full items-center justify-center pb-0.5">
+              S</p>
+          </div>
+          <div class="grid grid-cols-7 calendar-grid">
           </div>
         </div>
       </div>
@@ -589,7 +661,7 @@
         function loadCountries() {
           // fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson')
           fetch('https://raw.githubusercontent.com/nvkelso/natural-earth-vector/refs/heads/master/geojson/ne_50m_admin_0_countries.geojson')
-          // fetch('https://raw.githubusercontent.com/nvkelso/natural-earth-vector/refs/heads/master/geojson/ne_50m_populated_places_simple.geojson')
+            // fetch('https://raw.githubusercontent.com/nvkelso/natural-earth-vector/refs/heads/master/geojson/ne_50m_populated_places_simple.geojson')
             .then(res => res.json())
             .then(data => {
               // if we've already drawn it once, remove it
@@ -638,7 +710,19 @@
 
 
             document.getElementById('country-capital2').textContent = countryData.capital;
-            document.getElementById('country-population').textContent = countryData.population;
+
+            const population = countryData.population.split("");
+
+            let populationString = "";
+
+            for (let i = 0; i < population.length; i++) {
+              populationString += population[i];
+              if ((i + 1) % 3 == 0 && population.length > i + 1) {
+                populationString += ",";
+              }
+            }
+
+            document.getElementById('country-population').textContent = populationString;
             document.getElementById('country-currency').textContent = countryData.currency;
 
             // if (countryData && countryData.capital) {
@@ -711,6 +795,9 @@
             listItem.appendChild(removeButton);
             visitsList.appendChild(listItem);
           });
+
+          document.getElementById('start-date').value = "";
+          document.getElementById('end-date').value = "";
 
           modal.classList.remove('hidden');
         }
@@ -794,6 +881,132 @@
         });
 
         addCountries();
+
+        openCountry("France", "fr");
+
+        const startDate = document.getElementById('start-date');
+        const endDate = document.getElementById('end-date');
+        const calendarEl = document.querySelector('.calendar');
+        const monthEl = calendarEl.querySelector('.calendar-header .month-year');
+        const prevBtn = calendarEl.querySelector('[data-action="prev"]');
+        const nextBtn = calendarEl.querySelector('[data-action="next"]');
+        const daysGrid = calendarEl.querySelector('.calendar-grid');
+
+        let currentDate = new Date();
+        let selectedDate = new Date();
+
+        let startSelected = true;
+
+        startDate.addEventListener('click', function (e) {
+          const rect = this.getBoundingClientRect();
+
+          const ICON_WIDTH = 30;
+
+          if (e.clientX >= rect.right - ICON_WIDTH) {
+            e.preventDefault();
+
+            setTimeout(() => {
+              calendarEl.classList.remove("hidden");
+              startSelected = true;
+              if (startDate.value !== "") {
+                selectedDate = new Date(startDate.value + "T12:00:00Z");
+              }
+              renderCalendar(selectedDate);
+            }, 1);
+          }
+        });
+
+        endDate.addEventListener('click', function (e) {
+          const rect = this.getBoundingClientRect();
+
+          const ICON_WIDTH = 30;
+
+          if (e.clientX >= rect.right - ICON_WIDTH) {
+            e.preventDefault();
+
+            setTimeout(() => {
+              calendarEl.classList.remove("hidden");
+              startSelected = false;
+              if (endDate.value !== "") {
+                selectedDate = new Date(endDate.value + "T12:00:00Z");
+              }
+              renderCalendar(selectedDate);
+            }, 1);
+          }
+        });
+
+        document.getElementById('country-modal').addEventListener("click", () => {
+          calendarEl.classList.add("hidden");
+        });
+
+        function renderCalendar(date) {
+          daysGrid.innerHTML = '';
+          const year = date.getFullYear();
+          const month = date.getMonth();
+          const firstDayOfMonth = new Date(year, month, 1).getDay();
+          const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+          monthEl.textContent = date.toLocaleString('default', { month: 'long', year: 'numeric' });
+
+          // Fill blanks for first week
+          for (let i = 0; i < firstDayOfMonth; i++) {
+            const emptyDiv = document.createElement('div');
+            daysGrid.appendChild(emptyDiv);
+          }
+
+          // Fill days
+          for (let day = 1; day <= daysInMonth; day++) {
+            const btn = document.createElement('button');
+            btn.className = 'h-12 w-full text-sm font-medium leading-normal';
+            const inner = document.createElement('div');
+            inner.className = 'flex size-full items-center justify-center rounded-full hover:bg-[#4d5b66] transition';
+            inner.textContent = day;
+
+            // Highlight today
+            const today = selectedDate;
+            if (
+              day === today.getDate() &&
+              month === today.getMonth() &&
+              year === today.getFullYear()
+            ) {
+              inner.classList.add('bg-[#c7d8e9]', 'text-[#151a1e]', 'hover:bg-[#edf2f8]');
+            }
+
+            btn.appendChild(inner);
+            btn.addEventListener('click', () => {
+              if (startSelected) {
+                startDate.value = (new Date(year, month, day, 12)).toISOString().split('T')[0]
+              } else {
+                endDate.value = (new Date(year, month, day, 12)).toISOString().split('T')[0]
+              }
+
+              calendarEl.classList.add("hidden");
+            });
+            daysGrid.appendChild(btn);
+          }
+
+          const amount = daysGrid.childNodes.length;
+
+          for (let i = 0; i < 42 - amount; i++) {
+            const emptyDiv = document.createElement('div');
+            emptyDiv.className = 'h-12 w-full text-sm font-medium leading-normal opacity-0';
+            emptyDiv.textContent = "30";
+            daysGrid.appendChild(emptyDiv);
+          }
+        }
+
+        prevBtn.addEventListener('click', () => {
+          currentDate.setMonth(currentDate.getMonth() - 1);
+          renderCalendar(currentDate);
+        });
+
+        nextBtn.addEventListener('click', () => {
+          currentDate.setMonth(currentDate.getMonth() + 1);
+          renderCalendar(currentDate);
+        });
+
+        // Initialize
+        renderCalendar(currentDate);
       });
     </script>
   </div>
