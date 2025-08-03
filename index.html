@@ -108,7 +108,9 @@
                         const saveData = getSaveData();
 
                         for (let i = 0; i < saveData.countryVisits.length; i++) {
-                            visitedCountries.push(saveData.countryVisits[i].country.toUpperCase());
+                            if (!visitedCountries.includes(saveData.countryVisits[i].country.toUpperCase())) {
+                                visitedCountries.push(saveData.countryVisits[i].country.toUpperCase());
+                            }
                         }
 
                         document.getElementById('visited-count').innerText = visitedCountries.length + "/250";

@@ -6,6 +6,10 @@ const PORT = 8080;
 
 // Middleware to handle all incoming requests
 app.use((req, res) => {
+    if (req.path === "/favicon.ico") {
+        res.end();
+        return;
+    }
     if (req.path === "/") {
         res.redirect("/index.html");
         return;
