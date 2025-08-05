@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", async () => {
     const slider = document.getElementById('main-tab-slider');
     const countriesContent = document.getElementById('countries-content');
@@ -94,6 +93,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     function search() {
         const input = document.getElementById('search-input');
+        const visitedOnly = document.getElementById('visited-countries-checkbox').checked;
 
         if (currentTab === "countries") {
             const filter = input.value.toUpperCase();
@@ -105,7 +105,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 for (let i = 0; i < items.length; i++) {
                     const p = items[i].getElementsByTagName('p')[0];
                     const txtValue = p.textContent || p.innerText;
-                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    const isVisited = visitedCountries.includes(items[i].id.replace("country-", ""));
+
+                    if (txtValue.toUpperCase().indexOf(filter) > -1 && (!visitedOnly || isVisited)) {
                         items[i].style.display = "";
                         visibleItems++;
                     } else {
@@ -197,7 +199,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const newNode = document.createElement("label");
 
         if (visited) {
-            newNode.className = "flex justify-between items-center cursor-pointer rounded-lg px-3 py-3 transition-colors hover:bg-[#00FF0083] bg-[#00FF0036]";
+            newNode.className = "flex justify-between items-center cursor-pointer rounded-lg px-3 py-3 transition-colors bg-[#2b7fff4f] hover:bg-[#1447e64f]";
         }
         else {
             newNode.className = "flex justify-between items-center cursor-pointer rounded-lg px-3 py-3 transition-colors hover:bg-[#2e363e]";
@@ -489,6 +491,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     await loadData();
     getCountries();
 
+    const monthNames = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+
+    function dateFromText(text) {
+        const split = text.split(" ");
+        const monthIndex = monthNames.indexOf(split[0]);
+        return new Date(parseInt(split[1]), monthIndex);
+    }
+
     document.getElementById('modal-close').addEventListener('click', closeModal);
     document.getElementById('add-to-visited').addEventListener('click', () => {
         const saveData = getSaveData();
@@ -498,11 +511,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         const from = document.getElementById('from-button').textContent;
         const to = document.getElementById('to-button').textContent;
 
-        saveData.countryVisits.push({ country: document.getElementById('modal-country-name').name, from: (from === "From" ? null : (new Date(from)).getTime()), to: (to === "To" ? null : (new Date(to)).getTime()) })
+        let fromValue = null;
+        let toValue = null;
+
+        if (from !== "From" && to !== "To") {
+            fromValue = dateFromText(from).getTime();
+            toValue = dateFromText(to).getTime();
+        }
+
+        saveData.countryVisits.push({ country: document.getElementById('modal-country-name').name, from: fromValue, to: toValue })
 
         localStorage.setItem("saveData", JSON.stringify(saveData));
 
-        document.getElementById("country-" + document.getElementById('modal-country-name').name).className = "flex cursor-pointer items-center gap-x-3 rounded-lg px-3 py-3 transition-colors hover:bg-[#00FF0083] bg-[#00FF0036]";
+        document.getElementById("country-" + document.getElementById('modal-country-name').name).className = "flex cursor-pointer items-center gap-x-3 rounded-lg px-3 py-3 transition-colors bg-[#2b7fff4f] hover:bg-[#1447e64f]";
 
         openModal(document.getElementById('modal-country-name').textContent, document.getElementById('modal-country-name').name);
 
@@ -515,6 +536,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById('visit-button').addEventListener('click', () => {
         openModal(document.getElementById('country-name').textContent, document.getElementById('country-name').name);
     });
+
+    document.getElementById('visited-countries-checkbox').addEventListener('change', search);
 
     addCountries();
 

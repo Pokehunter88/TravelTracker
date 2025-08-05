@@ -17,6 +17,7 @@
     body {
       touch-action: manipulation;
       overflow: hidden;
+      height: 100dvh;
     }
 
     #visits-list {
@@ -130,10 +131,10 @@
 </head>
 
 <body>
-  <div class="relative flex min-h-screen flex-col bg-[#161a1d] dark group/design-root"
+  <div class="relative flex min-h-[100dvh] flex-col bg-[#161a1d] dark group/design-root"
     style='--checkbox-tick-svg: url(&apos;data:image/svg+xml,%3csvg viewBox=%270 0 16 16%27 fill=%27rgb(22,26,29)%27 xmlns=%27http://www.w3.org/2000/svg%27%3e%3cpath d=%27M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z%27/%3e%3c/svg%3e&apos;); font-family: "Space Grotesk", "Noto Sans", sans-serif;'>
     <header
-      class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#2e363e] px-5 py-3 sticky top-0 self-start w-full z-20 bg-[#161a1d]">
+      class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#2e363e] px-5 py-3 w-full z-20 bg-[#161a1d]">
       <div class="flex items-center gap-4 text-white">
         <div class="size-4">
           <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -175,10 +176,9 @@
         </div>
         <div class="px-4 py-3">
           <label class="flex flex-col min-w-50 h-12 w-full">
-            <div class="flex w-full flex-1 items-stretch rounded-xl h-full">
-              <div
-                class="text-[#a1adba] flex border-none bg-[#2e363e] items-center justify-center pl-4 rounded-l-xl border-r-0"
-                data-icon="MagnifyingGlass" data-size="24px" data-weight="regular">
+            <div class="flex w-full flex-1 items-center rounded-xl h-full bg-[#2e363e] px-4">
+              <div class="text-[#a1adba] flex items-center justify-center" data-icon="MagnifyingGlass" data-size="24px"
+                data-weight="regular">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor"
                   viewBox="0 0 256 256">
                   <path
@@ -187,14 +187,21 @@
                 </svg>
               </div>
               <input placeholder="Search"
-                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-white focus:outline-0 focus:ring-0 border-none bg-[#2e363e] focus:border-none h-full placeholder:text-[#a1adba] px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal"
+                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden text-white focus:outline-0 focus:ring-0 border-none bg-transparent h-full placeholder:text-[#a1adba] px-2 text-base font-normal leading-normal"
                 value="" onkeyup="search()" id="search-input" />
+              <div class="flex items-center gap-2">
+                <label for="visited-countries-checkbox"
+                  class="text-white text-sm font-medium whitespace-nowrap text-center">Visited</label>
+                <input type="checkbox"
+                  class="h-5 w-5 rounded border-[#3f4c5a] border-2 bg-transparent text-[#ccdbeb] checked:bg-[#ccdbeb] checked:border-[#ccdbeb] checked:bg-[image:--checkbox-tick-svg] focus:ring-0 focus:ring-offset-0 focus:border-[#3f4c5a] focus:outline-none"
+                  id="visited-countries-checkbox" />
+              </div>
             </div>
           </label>
         </div>
 
         <!-- START OF LIST -->
-        <div id="countries-content" class="overflow-scroll h-[65vh]">
+        <div id="countries-content" class="overflow-scroll h-[65dvh]">
           <h3
             class="text-white text-2xl font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4 place-self-center border-b border-solid border-b-[#2e363e]">
             Africa</h3>
@@ -261,7 +268,7 @@
               <div id="visit-content">
                 <div class="flex justify-center">
                   <button id="add-to-visited"
-                    class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 mb-5 rounded place-self-center transition-all duration-300 ease-in-out">Add
+                    class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 mb-5 rounded place-self-center transition-all duration-300 ease-in-out">Add
                     Visit</button>
                 </div>
 
@@ -354,7 +361,7 @@
               </button>
 
               <button
-                class="text-white text-base font-bold text-[20px] leading-normal bg-green-700 hover:bg-green-600 p-2 text-center rounded-full transition w-full"
+                class="text-white text-base font-bold text-[20px] leading-normal bg-blue-600 hover:bg-blue-500 p-2 text-center rounded-full transition w-full"
                 id="confirm-calendar">
                 Confirm
               </button>
@@ -370,7 +377,7 @@
           onclick="document.querySelector(':root').style.setProperty('--container-width', '0px');">
           Close
         </button>
-        <div class="h-[80vh] overflow-scroll">
+        <div class="h-[80dvh] overflow-scroll">
           <div class="flex px-4 py-3">
             <div class="w-full bg-center bg-no-repeat h-[170px] bg-cover rounded-xl object-cover bg-[#161a1d]" id="map">
             </div>

@@ -191,6 +191,12 @@ yearWheel.addEventListener('wheel', function (e) {
     });
 }, { passive: false });
 
+function dateFromText(text) {
+    const split = text.split(" ");
+    const monthIndex = months.indexOf(split[0]);
+    return new Date(parseInt(split[1]), monthIndex);
+}
+
 const calendarEl = document.querySelector('.calendar');
 const fromButton = document.getElementById('from-button');
 const toButton = document.getElementById('to-button');
@@ -210,8 +216,8 @@ document.getElementById('confirm-calendar').addEventListener("click", () => {
         if (toButton.textContent === "To") {
             toButton.textContent = fromButton.textContent;
         } else {
-            const d1 = new Date(fromButton.textContent);
-            const d2 = new Date(toButton.textContent);
+            const d1 = dateFromText(fromButton.textContent);
+            const d2 = dateFromText(toButton.textContent);
 
             if (d1.getTime() > d2.getTime()) {
                 toButton.textContent = fromButton.textContent;
@@ -223,8 +229,8 @@ document.getElementById('confirm-calendar').addEventListener("click", () => {
         if (fromButton.textContent === "From") {
             fromButton.textContent = toButton.textContent;
         } else {
-            const d1 = new Date(fromButton.textContent);
-            const d2 = new Date(toButton.textContent);
+            const d1 = dateFromText(fromButton.textContent);
+            const d2 = dateFromText(toButton.textContent);
 
             if (d1.getTime() > d2.getTime()) {
                 fromButton.textContent = toButton.textContent;
@@ -244,7 +250,7 @@ fromButton.addEventListener("click", () => {
         if (fromButton.textContent === "From") {
             now = new Date();
         } else {
-            now = new Date(fromButton.textContent);
+            now = dateFromText(fromButton.textContent);
         }
 
         onLoad();
@@ -259,7 +265,7 @@ toButton.addEventListener("click", () => {
         if (toButton.textContent === "To") {
             now = new Date();
         } else {
-            now = new Date(toButton.textContent);
+            now = dateFromText(toButton.textContent);
         }
 
         onLoad();

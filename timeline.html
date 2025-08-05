@@ -1,0 +1,328 @@
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
+    <link rel="stylesheet" as="style" onload="this.rel='stylesheet'"
+        href="https://fonts.googleapis.com/css2?display=swap&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&amp;family=Space+Grotesk%3Awght%40400%3B500%3B700" />
+
+    <title>Travel Tracker</title>
+    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        body {
+            touch-action: manipulation;
+            overflow: hidden;
+            height: 100dvh;
+        }
+
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #00000000;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: #2e363e;
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-corner {
+            background: #161a1d;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="relative flex size-full min-h-[100dvh] flex-col bg-[#161a1d] dark group/design-root overflow-x-hidden"
+        style='--checkbox-tick-svg: url(&apos;data:image/svg+xml,%3csvg viewBox=%270 0 16 16%27 fill=%27rgb(22,26,29)%27 xmlns=%27http://www.w3.org/2000/svg%27%3e%3cpath d=%27M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z%27/%3e%3c/svg%3e&apos;); font-family: "Space Grotesk", "Noto Sans", sans-serif;'>
+        <div class="layout-container flex h-full grow flex-col">
+            <header
+                class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#2e363e] px-5 py-3">
+                <div class="flex items-center gap-4 text-white">
+                    <div class="size-4">
+                        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M4 42.4379C4 42.4379 14.0962 36.0744 24 41.1692C35.0664 46.8624 44 42.2078 44 42.2078L44 7.01134C44 7.01134 35.068 11.6577 24.0031 5.96913C14.0971 0.876274 4 7.27094 4 7.27094L4 42.4379Z"
+                                fill="currentColor"></path>
+                        </svg>
+                    </div>
+                    <a class="text-white text-lg font-bold leading-tight tracking-[-0.015em]" href="/index.html">Travel
+                        Tracker</a>
+                </div>
+                <div class="flex flex-1 justify-end gap-5">
+                    <div
+                        class="grid grid-cols-2 grid-rows-2 px-2 md:grid-cols-4 md:grid-rows-1 items-center gap-x-5 gap-y-1">
+                        <a class="text-white text-sm font-medium leading-normal" href="/list.html">Countries</a>
+                        <a class="text-white text-sm font-medium leading-normal" href="/timeline.html">Timeline</a>
+                        <a class="text-white text-sm font-medium leading-normal" href="/wishlist.html">Wishlist</a>
+                        <a class="text-white text-sm font-medium leading-normal" href="/map.html">Map</a>
+                    </div>
+                    <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
+                        style='background-image: url("https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg");'>
+                    </div>
+                </div>
+            </header>
+            <div class="flex flex-1 justify-center py-5">
+                <div
+                    class="layout-content-container flex flex-col flex-1 max-w-[600px] transition items-center overflow-scroll h-[85dvh]">
+                    <div class="relative">
+                        <div class="absolute left-[10px] top-0 bottom-0 w-1 bg-gray-700 rounded-full"></div>
+                        <div class="relative timeline-year">
+                            <h2 class="text-xl font-bold py-4 pl-8 text-gray-400">2025</h2>
+                            <div class="pl-8 space-y-6">
+                                <div class="flex items-start relative timeline-item">
+                                    <div class="absolute left-[-28px] top-4 w-4 h-4 bg-sky-500 rounded-full">
+                                    </div>
+                                    <div class="ml-4 flex-grow">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <div class="flex items-center space-x-2">
+                                                    <img class="w-7 h-auto rounded" src="https://flagcdn.com/ma.svg" />
+                                                    <span
+                                                        class="text-lg font-medium text-white text-balance w-[300px]">Morocco</span>
+                                                </div>
+                                                <p class="text-sm text-gray-400">Aug, 2025 - Aug, 2030</p>
+                                            </div>
+                                            <button class="text-gray-400">
+                                                <i class="material-icons">more_horiz</i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-start relative timeline-item">
+                                    <div class="absolute left-[-28px] top-4 w-4 h-4 bg-sky-500 rounded-full">
+                                    </div>
+                                    <div class="ml-4 flex-grow">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <div class="flex items-center space-x-2">
+                                                    <img class="w-7 h-auto rounded" src="https://flagcdn.com/gb.svg" />
+                                                    <span
+                                                        class="text-lg font-medium text-sky-500 text-balance w-[300px]">United
+                                                        Kingdom</span>
+                                                </div>
+                                                <p class="text-sm text-gray-400">Jul - Sep, 2025</p>
+                                            </div>
+                                            <button class="text-gray-400">
+                                                <i class="material-icons">more_horiz</i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="relative timeline-year mt-4">
+                            <h2 class="text-xl font-bold py-4 pl-8 text-gray-400">2024</h2>
+                            <div class="pl-8 space-y-6">
+                                <div class="flex items-start relative timeline-item">
+                                    <div class="absolute left-[-28px] top-4 w-4 h-4 bg-sky-500 rounded-full">
+                                    </div>
+                                    <div class="ml-4 flex-grow">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <div class="flex items-center space-x-2">
+                                                    <img class="w-7 h-auto rounded" src="https://flagcdn.com/ma.svg" />
+                                                    <span class="text-lg font-medium text-white">Morocco</span>
+                                                </div>
+                                                <p class="text-sm text-gray-400">Feb - Dec, 2024</p>
+                                            </div>
+                                            <button class="text-gray-400">
+                                                <i class="material-icons">more_horiz</i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-start relative timeline-item">
+                                    <div class="absolute left-[-28px] top-4 w-4 h-4 bg-sky-500 rounded-full">
+                                    </div>
+                                    <div class="ml-4 flex-grow">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <div class="flex items-center space-x-2">
+                                                    <img class="w-7 h-auto rounded" src="https://flagcdn.com/ma.svg" />
+                                                    <span class="text-lg font-medium text-white">Morocco</span>
+                                                </div>
+                                                <p class="text-sm text-gray-400">Feb - Jun, 2024</p>
+                                            </div>
+                                            <button class="text-gray-400">
+                                                <i class="material-icons">more_horiz</i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-start relative timeline-item">
+                                    <div class="absolute left-[-28px] top-4 w-4 h-4 bg-sky-500 rounded-full">
+                                    </div>
+                                    <div class="ml-4 flex-grow">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <div class="flex items-center space-x-2">
+                                                    <img alt="Malaysian flag" class="w-5 h-auto"
+                                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0sIw8dk8I9MpL8ZLfQc6QId_EKsuxMZaYSAvhmiviYV2P3qzmmUr2zRnMv53obiq9VBbuQCmvCnOo1MP_3Tpn3s8D-VpmUbslzBdLH8KbCViSu9vCTMjf3tCQrmzp2gX7ysBNCr8zyCmBG3YdI8I21bShjgBdfRoUhcYpQQ3n5nhsHmoe9VbmIbyTOk1XomH51NxaIhGantFFUriRYdXlaM5WWFbxpD9fRtdaQKMknaQzfO55OUTLrgwUfox4_uzi8ZlirX-Lpr4X" />
+                                                    <span class="text-lg font-medium text-white">Malaysia</span>
+                                                </div>
+                                                <p class="text-sm text-gray-400">Feb - Jun, 2024</p>
+                                            </div>
+                                            <button class="text-gray-400">
+                                                <i class="material-icons">more_horiz</i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-start relative timeline-item">
+                                    <div class="absolute left-[-28px] top-4 w-4 h-4 bg-sky-500 rounded-full">
+                                    </div>
+                                    <div class="ml-4 flex-grow">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <div class="flex items-center space-x-2">
+                                                    <img alt="Croatian flag" class="w-5 h-auto"
+                                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPvFdqTND06FEn07nDU8v1W0XqTjMCij70uO0HE4S4sUMOzRt9JEXFzrUzbV5_8zrNs3a8kvnqp2W34iJmrHNrFvHLIeRnm-b0_ZNdRn5mkMhz6KDV7f6p9zkwiwesDTMkHT-XcHeomgjgRmDPNBtaeY2pAyouhANT2Ze32qci8aOzz_tF2sdJL-tquLYLHISDT5RiL2xp-gKADUfyxSM9wR9EfPUXHxaUhW9TZygtYqdgujE2Q3CodDPYHzl13a0J916Vf8SBByLe" />
+                                                    <span class="text-lg font-medium text-white">Croatia</span>
+                                                </div>
+                                                <p class="text-sm text-gray-400">Jan - Dec, 2024</p>
+                                            </div>
+                                            <button class="text-gray-400">
+                                                <i class="material-icons">more_horiz</i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="relative mt-4">
+                            <h2 class="text-xl font-bold py-4 pl-8 text-gray-400">2023</h2>
+                            <div class="pl-8 space-y-6">
+                                <div class="flex items-start relative">
+                                    <div class="absolute left-[-28px] top-4 w-4 h-4 bg-sky-500 rounded-full">
+                                    </div>
+                                    <div class="ml-4 flex-grow">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <div class="flex items-center space-x-2">
+                                                    <img alt="Belgian flag" class="w-5 h-auto"
+                                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuW0yaDDR6niFUbpKFJO2B4sgYZeUqEU5MFtOS5E439CirggalGcmnnARQTyO2UIBMaMOoaeNuSvdC20mXE1uXhKk4CVg-tSdIMFUABg0UKd6bWt0LAc07KrMQnWCvC0W3BylEJrQ7xiWoc6qZQHSxaMxXo3VzJUEQ69OBHyl6nK5XWWPCpU3skjcFzk0Du4n8Pl7gF2wGO1fnVBrhIHdW-BAgIwDOJQ3dthr35qDpk1K1zsFdMw7YYoM2eLJVIYH0M-jgmVm7xVWC" />
+                                                    <span class="text-lg font-medium text-white">Belgium</span>
+                                                </div>
+                                                <p class="text-sm text-gray-400">Mar, 2023 - May, 2025</p>
+                                            </div>
+                                            <button class="text-gray-400">
+                                                <i class="material-icons">more_horiz</i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-start relative">
+                                    <div class="absolute left-[-28px] top-4 w-4 h-4 bg-sky-500 rounded-full">
+                                    </div>
+                                    <div class="ml-4 flex-grow">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <div class="flex items-center space-x-2">
+                                                    <img alt="Belgian flag" class="w-5 h-auto"
+                                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuW0yaDDR6niFUbpKFJO2B4sgYZeUqEU5MFtOS5E439CirggalGcmnnARQTyO2UIBMaMOoaeNuSvdC20mXE1uXhKk4CVg-tSdIMFUABg0UKd6bWt0LAc07KrMQnWCvC0W3BylEJrQ7xiWoc6qZQHSxaMxXo3VzJUEQ69OBHyl6nK5XWWPCpU3skjcFzk0Du4n8Pl7gF2wGO1fnVBrhIHdW-BAgIwDOJQ3dthr35qDpk1K1zsFdMw7YYoM2eLJVIYH0M-jgmVm7xVWC" />
+                                                    <span class="text-lg font-medium text-white">Belgium</span>
+                                                </div>
+                                                <p class="text-sm text-gray-400">Mar, 2023 - May, 2025</p>
+                                            </div>
+                                            <button class="text-gray-400">
+                                                <i class="material-icons">more_horiz</i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-start relative">
+                                    <div class="absolute left-[-28px] top-4 w-4 h-4 bg-sky-500 rounded-full">
+                                    </div>
+                                    <div class="ml-4 flex-grow">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <div class="flex items-center space-x-2">
+                                                    <img alt="Belgian flag" class="w-5 h-auto"
+                                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuW0yaDDR6niFUbpKFJO2B4sgYZeUqEU5MFtOS5E439CirggalGcmnnARQTyO2UIBMaMOoaeNuSvdC20mXE1uXhKk4CVg-tSdIMFUABg0UKd6bWt0LAc07KrMQnWCvC0W3BylEJrQ7xiWoc6qZQHSxaMxXo3VzJUEQ69OBHyl6nK5XWWPCpU3skjcFzk0Du4n8Pl7gF2wGO1fnVBrhIHdW-BAgIwDOJQ3dthr35qDpk1K1zsFdMw7YYoM2eLJVIYH0M-jgmVm7xVWC" />
+                                                    <span class="text-lg font-medium text-white">Belgium</span>
+                                                </div>
+                                                <p class="text-sm text-gray-400">Mar, 2023 - May, 2025</p>
+                                            </div>
+                                            <button class="text-gray-400">
+                                                <i class="material-icons">more_horiz</i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-start relative">
+                                    <div class="absolute left-[-28px] top-4 w-4 h-4 bg-sky-500 rounded-full">
+                                    </div>
+                                    <div class="ml-4 flex-grow">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <div class="flex items-center space-x-2">
+                                                    <img alt="Belgian flag" class="w-5 h-auto"
+                                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuW0yaDDR6niFUbpKFJO2B4sgYZeUqEU5MFtOS5E439CirggalGcmnnARQTyO2UIBMaMOoaeNuSvdC20mXE1uXhKk4CVg-tSdIMFUABg0UKd6bWt0LAc07KrMQnWCvC0W3BylEJrQ7xiWoc6qZQHSxaMxXo3VzJUEQ69OBHyl6nK5XWWPCpU3skjcFzk0Du4n8Pl7gF2wGO1fnVBrhIHdW-BAgIwDOJQ3dthr35qDpk1K1zsFdMw7YYoM2eLJVIYH0M-jgmVm7xVWC" />
+                                                    <span class="text-lg font-medium text-white">Belgium</span>
+                                                </div>
+                                                <p class="text-sm text-gray-400">Mar, 2023 - May, 2025</p>
+                                            </div>
+                                            <button class="text-gray-400">
+                                                <i class="material-icons">more_horiz</i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-start relative">
+                                    <div class="absolute left-[-28px] top-4 w-4 h-4 bg-sky-500 rounded-full">
+                                    </div>
+                                    <div class="ml-4 flex-grow">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <div class="flex items-center space-x-2">
+                                                    <img alt="Belgian flag" class="w-5 h-auto"
+                                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuW0yaDDR6niFUbpKFJO2B4sgYZeUqEU5MFtOS5E439CirggalGcmnnARQTyO2UIBMaMOoaeNuSvdC20mXE1uXhKk4CVg-tSdIMFUABg0UKd6bWt0LAc07KrMQnWCvC0W3BylEJrQ7xiWoc6qZQHSxaMxXo3VzJUEQ69OBHyl6nK5XWWPCpU3skjcFzk0Du4n8Pl7gF2wGO1fnVBrhIHdW-BAgIwDOJQ3dthr35qDpk1K1zsFdMw7YYoM2eLJVIYH0M-jgmVm7xVWC" />
+                                                    <span class="text-lg font-medium text-white">Belgium</span>
+                                                </div>
+                                                <p class="text-sm text-gray-400">Mar, 2023 - May, 2025</p>
+                                            </div>
+                                            <button class="text-gray-400">
+                                                <i class="material-icons">more_horiz</i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-start relative">
+                                    <div class="absolute left-[-28px] top-4 w-4 h-4 bg-sky-500 rounded-full">
+                                    </div>
+                                    <div class="ml-4 flex-grow">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <div class="flex items-center space-x-2">
+                                                    <img alt="Belgian flag" class="w-5 h-auto"
+                                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuW0yaDDR6niFUbpKFJO2B4sgYZeUqEU5MFtOS5E439CirggalGcmnnARQTyO2UIBMaMOoaeNuSvdC20mXE1uXhKk4CVg-tSdIMFUABg0UKd6bWt0LAc07KrMQnWCvC0W3BylEJrQ7xiWoc6qZQHSxaMxXo3VzJUEQ69OBHyl6nK5XWWPCpU3skjcFzk0Du4n8Pl7gF2wGO1fnVBrhIHdW-BAgIwDOJQ3dthr35qDpk1K1zsFdMw7YYoM2eLJVIYH0M-jgmVm7xVWC" />
+                                                    <span class="text-lg font-medium text-white">Belgium</span>
+                                                </div>
+                                                <p class="text-sm text-gray-400">Mar, 2023 - May, 2025</p>
+                                            </div>
+                                            <button class="text-gray-400">
+                                                <i class="material-icons">more_horiz</i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
