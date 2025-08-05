@@ -233,6 +233,10 @@ document.getElementById('confirm-calendar').addEventListener("click", () => {
     }
 });
 
+document.getElementById('cancel-calendar').addEventListener("click", () => {
+    calendarEl.classList.add("hidden");
+});
+
 fromButton.addEventListener("click", () => {
     setTimeout(() => {
         calendarEl.classList.remove("hidden");

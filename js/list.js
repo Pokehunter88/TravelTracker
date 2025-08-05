@@ -272,15 +272,19 @@ document.addEventListener("DOMContentLoaded", async () => {
             // fetch('https://raw.githubusercontent.com/nvkelso/natural-earth-vector/refs/heads/master/geojson/ne_50m_populated_places_simple.geojson')
             .then(res => res.json())
             .then(data => {
-                // if we've already drawn it once, remove it
                 if (layer) {
                     map.removeLayer(layer);
                 }
-                // draw it again
+
                 layer = L.geoJSON(data, {
                     style: countryStyle,
-                    // onEachFeature: onEachCountry
                 }).addTo(map);
+
+                const element = document.querySelector('.map-start');
+                element.classList.remove("map-start");
+                setTimeout(() => {
+                    element.style.transition = "max-width 0.5s ease-in-out, left 0.5s ease-in-out";
+                }, 1);
             });
     }
 
@@ -303,6 +307,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (document.getElementById('country-name').textContent === name && document.querySelector(':root').style.getPropertyValue('--container-width') === "960px") {
             document.querySelector(':root').style.setProperty('--container-width', '0px');
         } else {
+            if (document.querySelector(':root').style.getPropertyValue('--container-width') !== "960px") {
+                setTimeout(() => {
+                    map.invalidateSize();
+                }, 500);
+            }
+
             document.querySelector(':root').style.setProperty('--container-width', '960px');
 
             document.getElementById('country-name').textContent = name;
@@ -475,13 +485,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 });
             });
     }
-
-    // document.querySelector(':root').style.setProperty('--container-width', '0px');
-    const element = document.querySelector('.map-start');
-    element.classList.remove("map-start");
-    setTimeout(() => {
-        element.style.transition = "max-width 0.5s ease-in-out, left 0.5s ease-in-out";
-    }, 1);
 
     await loadData();
     getCountries();

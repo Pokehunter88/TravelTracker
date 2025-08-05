@@ -56,12 +56,21 @@
     }
 
     .map-start {
-      max-width: 960px !important;
-      position: fixed !important;
+      position: absolute !important;
       opacity: 0;
     }
 
+    @media only screen and (min-width: 700px) {
+      .map-start {
+        max-width: 480px !important;
+      }
+    }
+
     @media only screen and (max-width: 700px) {
+      .map-start {
+        max-width: 960px !important;
+      }
+
       .country-information {
         background: #161a1d !important;
         position: fixed !important;
@@ -231,7 +240,8 @@
         </div>
 
         <!-- Modal -->
-        <div id="country-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-30 hidden">
+        <div id="country-modal"
+          class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-30 hidden">
           <div class="bg-[#161a1d] p-8 rounded-lg shadow-lg text-white max-w-[400px] w-full m-10">
             <h2 id="modal-country-name" class="text-2xl font-bold mb-4"></h2>
             <div class="flex flex-col gap-4">
@@ -256,10 +266,9 @@
                 </div>
 
                 <div id="visited-dates" class="">
-                  <!-- <label for="start-date" class="mr-3 w-full text-center">From:</label> -->
-                  <input type="date" id="start-date" class="bg-gray-700 text-white rounded p-2 ml-3 hidden">
                   <button
-                    class="text-white text-base font-bold text-[20px] leading-normal hover:bg-[#4c5967] bg-[#2e363e] p-2 text-center rounded-xl transition w-full" id="from-button">From</button>
+                    class="text-white text-base font-bold text-[20px] leading-normal hover:bg-[#4c5967] bg-[#2e363e] p-2 text-center rounded-xl transition w-full"
+                    id="from-button">From</button>
                   <div class="mb-2"></div>
 
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" role="img"
@@ -270,10 +279,9 @@
                   </svg>
 
                   <div class="mb-2"></div>
-                  <!-- <label for="end-date" class="mr-3 w-full text-center">To:</label> -->
-                  <input type="date" id="end-date" class="bg-gray-700 text-white rounded p-2 ml-3 hidden">
                   <button
-                    class="text-white text-base font-bold text-[20px] leading-normal hover:bg-[#4c5967] bg-[#2e363e] p-2 text-center rounded-xl transition w-full" id="to-button">To</button>
+                    class="text-white text-base font-bold text-[20px] leading-normal hover:bg-[#4c5967] bg-[#2e363e] p-2 text-center rounded-xl transition w-full"
+                    id="to-button">To</button>
                 </div>
 
                 <ul id="visits-list" class="text-white"></ul>
@@ -338,17 +346,25 @@
               </div>
             </div>
 
-            <button
-              class="text-white text-base font-bold text-[20px] leading-normal hover:bg-[#4c5967] bg-[#2e363e] p-2 text-center rounded-full transition w-full"
-              id="confirm-calendar">
-              Confirm
-            </button>
+            <div class="w-full flex flex-row gap-3">
+              <button
+                class="text-white text-base font-bold text-[20px] leading-normal hover:bg-[#4c5967] bg-[#2e363e] p-2 text-center rounded-full transition w-full"
+                id="cancel-calendar">
+                Cancel
+              </button>
+
+              <button
+                class="text-white text-base font-bold text-[20px] leading-normal bg-green-700 hover:bg-green-600 p-2 text-center rounded-full transition w-full"
+                id="confirm-calendar">
+                Confirm
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
       <div
-        class="layout-content-container flex flex-col flex-1 overflow-hidden sticky top-20 self-start country-information map-start w-full max-w-[0px]">
+        class="layout-content-container flex flex-col flex-1 overflow-hidden sticky top-20 self-start country-information map-start w-full">
         <button
           class="text-white text-base font-bold text-[20px] leading-normal hover:bg-[#4c5967] bg-[#2e363e] p-2 text-center rounded-full transition mx-4"
           onclick="document.querySelector(':root').style.setProperty('--container-width', '0px');">
