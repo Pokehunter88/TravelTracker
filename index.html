@@ -48,9 +48,9 @@
                         <a class="text-white text-sm font-medium leading-normal" href="/wishlist.html">Wishlist</a>
                         <a class="text-white text-sm font-medium leading-normal" href="/map.html">Map</a>
                     </div>
-                    <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
+                    <!-- <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
                         style='background-image: url("https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg");'>
-                    </div>
+                    </div> -->
                 </div>
             </header>
             <div class="flex flex-1 justify-center py-5">
@@ -69,7 +69,7 @@
                                 Visited</p>
                         </div>
                     </div>
-                    <div id="map" class="h-full v-full bg-[#161a1d]"></div>
+                    <div id="map" class="h-full bg-[#161a1d]"></div>
 
                     <script>
                         function getSaveData() {
@@ -144,7 +144,7 @@
                         }).setView([0, 0], 1);
 
                         // Load country GeoJSON data
-                        fetch('https://raw.githubusercontent.com/nvkelso/natural-earth-vector/refs/heads/master/geojson/ne_50m_admin_0_countries.geojson')
+                        fetch('/ne_50m_admin_0_countries.geojson')
                             .then(res => res.json())
                             .then(data => {
                                 L.geoJSON(data, {

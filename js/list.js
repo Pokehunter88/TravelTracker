@@ -309,12 +309,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (document.getElementById('country-name').textContent === name && document.querySelector(':root').style.getPropertyValue('--container-width') === "960px") {
             document.querySelector(':root').style.setProperty('--container-width', '0px');
         } else {
-            if (document.querySelector(':root').style.getPropertyValue('--container-width') !== "960px") {
-                setTimeout(() => {
-                    map.invalidateSize();
-                }, 500);
-            }
-
             document.querySelector(':root').style.setProperty('--container-width', '960px');
 
             document.getElementById('country-name').textContent = name;
@@ -360,6 +354,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             //   map.setView([0, 0], 0);
             // }
 
+            let layerBounds = null;
+
             layer.eachLayer(function (currentLayer) {
                 const options = countryStyle(currentLayer.feature);
 
@@ -369,8 +365,18 @@ document.addEventListener("DOMContentLoaded", async () => {
                 currentLayer.setStyle(undefined);
                 if (currentLayer.feature.properties.ISO_A2_EH === flag.toUpperCase()) {
                     map.fitBounds(currentLayer.getBounds(), true);
+
+                    layerBounds = currentLayer.getBounds();
                 }
             });
+
+            setTimeout(() => {
+                map.invalidateSize();
+
+                if (layerBounds !== null) {
+                    map.fitBounds(layerBounds, true);
+                }
+            }, 500);
         }
     }
 
