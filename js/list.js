@@ -1,6 +1,4 @@
 document.addEventListener("DOMContentLoaded", async () => {
-    console.log("test");
-
     const slider = document.getElementById('main-tab-slider');
     const countriesContent = document.getElementById('countries-content');
     const citiesContent = document.getElementById('cities-content');
@@ -13,14 +11,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     let countryToOpen = null;
 
     let countryInfoMap = new Map();
-    let cities15000Map = new Map();
+    // let cities15000Map = new Map();
 
     async function loadData() {
         try {
             const url = new URL(window.location.href);
             const id = url.hash.replace(/^#/, '');
 
-            const countryInfoResponse = await fetch('countryInfo.txt');
+            const countryInfoResponse = await fetch('countryInfo.txt', { cache: "force-cache" });
             const countryInfoText = await countryInfoResponse.text();
             countryInfoText.split('\n').forEach(line => {
                 if (line.startsWith('#') || line.trim() === '') {
@@ -35,13 +33,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                     createItem(countryName, countryCode, columns[8].toLowerCase(), visitedCountries.includes(countryCode));
 
-                    // if (id === countryCode.toLowerCase()) {
-                    //     setTimeout(() => {
-                    //         openCountry(countryName, countryCode);
-                    //     }, 1000);
-                    // }
-
-
                     if (id === countryCode.toLowerCase() && layer) {
                         setTimeout(() => {
                             openCountry(countryName, countryCode);
@@ -52,25 +43,25 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             });
 
-            // const cities15000Response = await fetch('cities15000.txt');
-            // const cities15000Text = await cities15000Response.text();
-            // cities15000Text.split('\n').forEach(line => {
-            //     if (line.startsWith('#') || line.trim() === '') {
-            //         return;
-            //     }
-            //     const columns = line.split('\t');
-            //     if (columns.length > 4) {
-            //         const cityName = columns[2];
-            //         const cityName2 = columns[1];
-            //         const countryCode = columns[8];
-            //         const latitude = parseFloat(columns[4]);
-            //         const longitude = parseFloat(columns[5]);
-            //         cities15000Map.set(cityName + columns[8], { latitude: latitude, longitude: longitude });
+            const cities15000Response = await fetch('cities15000.txt', { cache: "force-cache" });
+            const cities15000Text = await cities15000Response.text();
+            cities15000Text.split('\n').forEach(line => {
+                if (line.startsWith('#') || line.trim() === '') {
+                    return;
+                }
+                const columns = line.split('\t');
+                if (columns.length > 4) {
+                    const cityName = columns[2];
+                    const cityName2 = columns[1];
+                    const countryCode = columns[8];
+                    const latitude = parseFloat(columns[4]);
+                    const longitude = parseFloat(columns[5]);
+                    // cities15000Map.set(cityName + columns[8], { latitude: latitude, longitude: longitude });
 
-            //         if (countryCode === "FR")
-            //             createItemCity(cityName, cityName2, countryCode, false);
-            //     }
-            // });
+                    if (countryCode === "FR")
+                        createItemCity(cityName, cityName2, countryCode, false);
+                }
+            });
         } catch (error) {
             console.error('Error loading data:', error);
         }
@@ -294,9 +285,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     // helper to (re)load and draw the countries
     function loadCountries() {
         // fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson')
+        // fetch('https://raw.githubusercontent.com/nvkelso/natural-earth-vector/refs/heads/master/geojson/ne_50m_populated_places_simple.geojson')
         // fetch('https://raw.githubusercontent.com/nvkelso/natural-earth-vector/refs/heads/master/geojson/ne_50m_admin_0_countries.geojson')
         fetch('/ne_50m_admin_0_countries.geojson', { cache: "force-cache" })
-            // fetch('https://raw.githubusercontent.com/nvkelso/natural-earth-vector/refs/heads/master/geojson/ne_50m_populated_places_simple.geojson')
             .then(res => res.json())
             .then(data => {
                 if (layer) {
@@ -342,6 +333,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     window.closeCountry = closeCountry;
+
+    let lastTimeout = null;
 
     function openCountry(name, flag) {
         if (document.getElementById('country-name').textContent === name && document.querySelector(':root').style.getPropertyValue('--container-width') === "960px") {
@@ -412,7 +405,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                     }
                 });
 
-                setTimeout(() => {
+                if (lastTimeout !== null) {
+                    clearTimeout(lastTimeout);
+                }
+
+                lastTimeout = setTimeout(() => {
                     map.invalidateSize();
 
                     if (layerBounds !== null) {
