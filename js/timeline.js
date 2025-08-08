@@ -73,24 +73,24 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     function highlightCountryText(country) {
         for (let i = 0; i < countryList.length; i++) {
-            countryList[i][1].className = 'text-lg font-medium text-white text-balance scroll-m-[35dvh]';
+            countryList[i][1].className = 'text-lg font-medium text-white text-balance scroll-m-[15dvh] md:scroll-m-[35dvh]';
         }
         for (let i = 0; i < unknownCountryList.length; i++) {
-            unknownCountryList[i].className = 'text-lg font-medium text-white text-balance scroll-m-[35dvh]';
+            unknownCountryList[i].className = 'text-lg font-medium text-white text-balance scroll-m-[15dvh] md:scroll-m-[35dvh]';
         }
 
-        countryList[country][1].className = 'text-lg font-medium text-[#0ea5e9] text-balance scroll-m-[35dvh]';
+        countryList[country][1].className = 'text-lg font-medium text-[#0ea5e9] text-balance scroll-m-[15dvh] md:scroll-m-[35dvh]';
     }
 
     function highlightCountryTextUnknown(country) {
         for (let i = 0; i < countryList.length; i++) {
-            countryList[i][1].className = 'text-lg font-medium text-white text-balance scroll-m-[35dvh]';
+            countryList[i][1].className = 'text-lg font-medium text-white text-balance scroll-m-[15dvh] md:scroll-m-[35dvh]';
         }
         for (let i = 0; i < unknownCountryList.length; i++) {
-            unknownCountryList[i].className = 'text-lg font-medium text-white text-balance scroll-m-[35dvh]';
+            unknownCountryList[i].className = 'text-lg font-medium text-white text-balance scroll-m-[15dvh] md:scroll-m-[35dvh]';
         }
 
-        unknownCountryList[country].className = 'text-lg font-medium text-[#0ea5e9] text-balance scroll-m-[35dvh]';
+        unknownCountryList[country].className = 'text-lg font-medium text-[#0ea5e9] text-balance scroll-m-[15dvh] md:scroll-m-[35dvh]';
     }
 
     function animationLoop() {
@@ -115,6 +115,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     playButton.addEventListener("click", () => {
         if (lastTimeout === null) {
+            if (currentCountryAnimation >= countryList.length - 1) {
+                currentCountryAnimation = 0;
+            }
+
             animationLoop();
 
             playButton.textContent = "Pause";
@@ -129,16 +133,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     speedButton.addEventListener("click", () => {
         if (speed === 0.5) {
             speed = 1
-            speedButton.textContent = "1";
+            speedButton.textContent = "x1.0";
         } else if (speed === 1) {
             speed = 1.5
-            speedButton.textContent = "1.5";
+            speedButton.textContent = "x1.5";
         } else if (speed === 1.5) {
             speed = 2
-            speedButton.textContent = "2";
+            speedButton.textContent = "x2.0";
         } else if (speed === 2) {
             speed = 0.5
-            speedButton.textContent = "0.5";
+            speedButton.textContent = "x0.5";
         }
     });
 
@@ -150,6 +154,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         currentCountryAnimation = 0;
         highlightCountryText(0);
+        highlightCountry(countryList[0][0]);
         countryList[0][1].scrollIntoView();
 
         // animationLoop();
@@ -166,16 +171,21 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const count = unknown ? unknownCountryList.length : countryList.length;
 
-        item.addEventListener('click', () => {
-            highlightCountry(visit.country);
-
-            if (unknown) {
-                highlightCountryTextUnknown(count);
+        item.addEventListener('click', (e) => {
+            if (e.target.nodeName === 'I') {
+                window.location = "/list.html#" + visit.country;
             } else {
-                highlightCountryText((countryList.length - 1) - count);
+                highlightCountry(visit.country);
+
+                if (unknown) {
+                    highlightCountryTextUnknown(count);
+                } else {
+                    highlightCountryText((countryList.length - 1) - count);
+                }
+
+                currentCountryAnimation = unknown ? 0 : (countryList.length - 1) - count;
             }
 
-            currentCountryAnimation = unknown ? 0 : (countryList.length - 1) - count;
         });
 
         const dot = document.createElement('div');
@@ -203,7 +213,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         countryInfo.appendChild(flag);
 
         const name = document.createElement('span');
-        name.className = 'text-lg font-medium text-white text-balance scroll-m-[35dvh]';
+        name.className = 'text-lg font-medium text-white text-balance scroll-m-[15dvh] md:scroll-m-[35dvh]';
         name.textContent = countryName;
         countryInfo.appendChild(name);
 
@@ -237,10 +247,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
         details.appendChild(date);
 
-        // const moreButton = document.createElement('button');
-        // moreButton.className = 'text-gray-400';
-        // moreButton.innerHTML = '<i class="material-icons">more_horiz</i>';
-        // innerContent.appendChild(moreButton);
+        const moreButton = document.createElement('button');
+        moreButton.innerHTML = '<i class="material-icons text-gray-400 text-3xl hover:bg-[#FFFFFF20] w-10 rounded-full">more_horiz</i>';
+        innerContent.appendChild(moreButton);
 
         return item;
     }
@@ -373,7 +382,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             attributionControl: false
         }).setView([0, 0], 1);
 
-        fetch('/ne_50m_admin_0_countries.geojson')
+        fetch('/ne_50m_admin_0_countries.geojson', { cache: "force-cache" })
             .then(res => res.json())
             .then(data => {
                 geoJsonLayer = L.geoJSON(data, {

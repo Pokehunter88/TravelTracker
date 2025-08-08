@@ -1,4 +1,6 @@
 document.addEventListener("DOMContentLoaded", async () => {
+    console.log("test");
+
     const slider = document.getElementById('main-tab-slider');
     const countriesContent = document.getElementById('countries-content');
     const citiesContent = document.getElementById('cities-content');
@@ -8,11 +10,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     const visitContent = document.getElementById('visit-content');
     const wishlistContent = document.getElementById('wishlist-content');
 
+    let countryToOpen = null;
+
     let countryInfoMap = new Map();
     let cities15000Map = new Map();
 
     async function loadData() {
         try {
+            const url = new URL(window.location.href);
+            const id = url.hash.replace(/^#/, '');
+
             const countryInfoResponse = await fetch('countryInfo.txt');
             const countryInfoText = await countryInfoResponse.text();
             countryInfoText.split('\n').forEach(line => {
@@ -22,30 +29,48 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const columns = line.split('\t');
                 if (columns.length > 4) {
                     const countryCode = columns[0].toLowerCase();
+                    const countryName = columns[4];
                     const capital = columns[5];
                     countryInfoMap.set(countryCode, { capital: capital, population: columns[7], currency: columns[11] });
+
+                    createItem(countryName, countryCode, columns[8].toLowerCase(), visitedCountries.includes(countryCode));
+
+                    // if (id === countryCode.toLowerCase()) {
+                    //     setTimeout(() => {
+                    //         openCountry(countryName, countryCode);
+                    //     }, 1000);
+                    // }
+
+
+                    if (id === countryCode.toLowerCase() && layer) {
+                        setTimeout(() => {
+                            openCountry(countryName, countryCode);
+                        }, 100);
+                    } else if (id === countryCode.toLowerCase()) {
+                        countryToOpen = [countryName, countryCode];
+                    }
                 }
             });
 
-            const cities15000Response = await fetch('cities15000.txt');
-            const cities15000Text = await cities15000Response.text();
-            cities15000Text.split('\n').forEach(line => {
-                if (line.startsWith('#') || line.trim() === '') {
-                    return;
-                }
-                const columns = line.split('\t');
-                if (columns.length > 4) {
-                    const cityName = columns[2];
-                    const cityName2 = columns[1];
-                    const countryCode = columns[8];
-                    const latitude = parseFloat(columns[4]);
-                    const longitude = parseFloat(columns[5]);
-                    cities15000Map.set(cityName + columns[8], { latitude: latitude, longitude: longitude });
+            // const cities15000Response = await fetch('cities15000.txt');
+            // const cities15000Text = await cities15000Response.text();
+            // cities15000Text.split('\n').forEach(line => {
+            //     if (line.startsWith('#') || line.trim() === '') {
+            //         return;
+            //     }
+            //     const columns = line.split('\t');
+            //     if (columns.length > 4) {
+            //         const cityName = columns[2];
+            //         const cityName2 = columns[1];
+            //         const countryCode = columns[8];
+            //         const latitude = parseFloat(columns[4]);
+            //         const longitude = parseFloat(columns[5]);
+            //         cities15000Map.set(cityName + columns[8], { latitude: latitude, longitude: longitude });
 
-                    if (countryCode === "FR")
-                        createItemCity(cityName, cityName2, countryCode, false);
-                }
-            });
+            //         if (countryCode === "FR")
+            //             createItemCity(cityName, cityName2, countryCode, false);
+            //     }
+            // });
         } catch (error) {
             console.error('Error loading data:', error);
         }
@@ -270,7 +295,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     function loadCountries() {
         // fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson')
         // fetch('https://raw.githubusercontent.com/nvkelso/natural-earth-vector/refs/heads/master/geojson/ne_50m_admin_0_countries.geojson')
-        fetch('/ne_50m_admin_0_countries.geojson')
+        fetch('/ne_50m_admin_0_countries.geojson', { cache: "force-cache" })
             // fetch('https://raw.githubusercontent.com/nvkelso/natural-earth-vector/refs/heads/master/geojson/ne_50m_populated_places_simple.geojson')
             .then(res => res.json())
             .then(data => {
@@ -287,6 +312,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                 setTimeout(() => {
                     element.style.transition = "max-width 0.5s ease-in-out, left 0.5s ease-in-out";
                 }, 1);
+
+                if (countryToOpen !== null) {
+                    setTimeout(() => {
+                        openCountry(countryToOpen[0], countryToOpen[1]);
+                    }, 100);
+                }
             });
     }
 
@@ -305,11 +336,20 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
+    function closeCountry() {
+        document.querySelector(':root').style.setProperty('--container-width', '0px');
+        window.location.hash = "";
+    }
+
+    window.closeCountry = closeCountry;
+
     function openCountry(name, flag) {
         if (document.getElementById('country-name').textContent === name && document.querySelector(':root').style.getPropertyValue('--container-width') === "960px") {
-            document.querySelector(':root').style.setProperty('--container-width', '0px');
+            closeCountry()
         } else {
             document.querySelector(':root').style.setProperty('--container-width', '960px');
+
+            window.location.hash = flag;
 
             document.getElementById('country-name').textContent = name;
             document.getElementById('country-name').name = flag;
@@ -354,29 +394,32 @@ document.addEventListener("DOMContentLoaded", async () => {
             //   map.setView([0, 0], 0);
             // }
 
-            let layerBounds = null;
 
-            layer.eachLayer(function (currentLayer) {
-                const options = countryStyle(currentLayer.feature);
+            (async () => {
+                let layerBounds = null;
 
-                currentLayer.options.fillColor = options.fillColor;
-                currentLayer.options.color = options.color;
+                layer.eachLayer(function (currentLayer) {
+                    const options = countryStyle(currentLayer.feature);
 
-                currentLayer.setStyle(undefined);
-                if (currentLayer.feature.properties.ISO_A2_EH === flag.toUpperCase()) {
-                    map.fitBounds(currentLayer.getBounds(), true);
+                    currentLayer.options.fillColor = options.fillColor;
+                    currentLayer.options.color = options.color;
 
-                    layerBounds = currentLayer.getBounds();
-                }
-            });
+                    currentLayer.setStyle(undefined);
+                    if (currentLayer.feature.properties.ISO_A2_EH === flag.toUpperCase()) {
+                        map.fitBounds(currentLayer.getBounds(), true);
 
-            setTimeout(() => {
-                map.invalidateSize();
+                        layerBounds = currentLayer.getBounds();
+                    }
+                });
 
-                if (layerBounds !== null) {
-                    map.fitBounds(layerBounds, true);
-                }
-            }, 500);
+                setTimeout(() => {
+                    map.invalidateSize();
+
+                    if (layerBounds !== null) {
+                        map.fitBounds(layerBounds, true);
+                    }
+                }, 500);
+            })()
         }
     }
 
@@ -475,27 +518,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    function addCountries() {
-        fetch('countryInfo.txt')
-            .then(response => response.text())
-            .then(data => {
-                const lines = data.split('\n');
-                lines.forEach(line => {
-                    if (line.startsWith('#') || line.trim() === '') {
-                        return;
-                    }
-                    const columns = line.split('	');
-                    if (columns.length > 4) {
-                        const countryCode = columns[0].toLowerCase();
-                        const countryName = columns[4];
-                        createItem(countryName, countryCode, columns[8].toLowerCase(), visitedCountries.includes(countryCode));
-                    }
-                });
-            });
-    }
-
-    await loadData();
     getCountries();
+    await loadData();
 
     const monthNames = [
         "January", "February", "March", "April", "May", "June",
@@ -545,7 +569,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     document.getElementById('visited-countries-checkbox').addEventListener('change', search);
 
-    addCountries();
+    // addCountries();
 
     // openCountry("France", "fr");
 });
