@@ -153,7 +153,7 @@
                         }).setView([0, 0], 1);
 
                         // Load country GeoJSON data
-                        fetch('/ne_50m_admin_0_countries.geojson', { cache: "force-cache" })
+                        fetch('/ne_50m_admin_1_states_provinces.geojson', { cache: "force-cache" })
                             .then(res => res.json())
                             .then(data => {
                                 L.geoJSON(data, {

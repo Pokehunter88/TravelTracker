@@ -35,10 +35,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"
     ];
-    const monthNames = [
-        "January", "February", "March", "April", "May", "June",
-        "July", "August", "September", "October", "November", "December"
-    ];
 
     // --- Data Loading ---
     async function loadData() {
@@ -57,7 +53,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                     countryInfoMap.set(countryCode, {
                         capital: columns[5],
                         population: columns[7],
-                        currency: columns[11]
+                        currency: columns[11],
+                        name: countryName
                     });
                     createItem(countryName, countryCode, columns[8].toLowerCase(), visitedCountries.includes(countryCode));
                     if (id === countryCode.toLowerCase() && layer) {
@@ -82,9 +79,15 @@ document.addEventListener("DOMContentLoaded", async () => {
                     }
                 }
             });
-        } catch (error) {
-            console.error('Error loading data:', error);
-        }
+
+            const regionsResponse = await fetch('ne_50m_admin_1_states_provinces.geojson', { cache: "force-cache" });
+            const regionsData = await regionsResponse.json();
+            regionsData.features.forEach(feature => {
+                const regionName = feature.properties.name;
+                const countryCode = feature.properties.iso_a2;
+                createItemRegion(regionName, countryInfoMap.get(countryCode.toLowerCase()).name, false);
+            });
+        } catch (error) { console.error('Error loading data:', error); }
     }
 
     // --- UI & Tab Management ---
@@ -165,6 +168,26 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const txtValue = p.textContent || p.innerText;
                 items[i].style.display = txtValue.toUpperCase().indexOf(filter) > -1 ? "" : "none";
             }
+        } else if (currentTab === "regions") {
+            const list = document.getElementById('regions');
+            const items = list.getElementsByTagName('label');
+            for (let i = 0; i < items.length; i++) {
+                const elements = items[i].getElementsByTagName('p');
+                const p = elements[0];
+                const p2 = elements[1];
+                const txtValue = p.textContent || p.innerText;
+                const txtValue2 = p2.textContent || p2.innerText;
+
+                if (filter.includes(":")) {
+                    const split = filter.split(":");
+                    const part1 = split[0];
+                    const part2 = split[1][0] === " " ? split[1].substring(1) : split[1];
+
+                    items[i].style.display = txtValue.toUpperCase().indexOf(part2) > -1 & txtValue2.toUpperCase().indexOf(part1) > -1 ? "" : "none";
+                } else {
+                    items[i].style.display = txtValue.toUpperCase().indexOf(filter) > -1 || txtValue2.toUpperCase().indexOf(filter) > -1 ? "" : "none";
+                }
+            }
         }
     }
     window.search = search;
@@ -213,6 +236,37 @@ document.addEventListener("DOMContentLoaded", async () => {
         newNode.append(leftContainer, text2);
         newNode.addEventListener('click', () => { /* openModal(name, flag); openCountry(name, flag); */ });
         document.getElementById("cities").append(newNode);
+    }
+
+    function createItemRegion(name, country, visited) {
+        const newNode = document.createElement("label");
+        newNode.className = `flex justify-between items-center cursor-pointer rounded-lg p-2 transition-colors ${visited ? 'bg-[#00FF0036] hover:bg-[#00FF0083]' : 'hover:bg-[#2e363e]'}`;
+        newNode.id = "region-" + name;
+        newNode.classList.add("region-" + country.replaceAll(" ", "-"));
+
+        const leftContainer = document.createElement("div");
+        leftContainer.className = "flex flex-row items-center gap-x-3";
+
+        const text = document.createElement("p");
+        text.className = "text-white text-base font-normal leading-normal peer-checked:text-[#dbe5ef]";
+        text.textContent = name;
+
+        const text2 = document.createElement("p");
+        text2.className = "text-gray-500 text-base font-normal leading-normal peer-checked:text-[#dbe5ef] hover:bg-[#FFFFFF10] underline py-1 px-3 transition rounded";
+        text2.name = "Country";
+        text2.textContent = country;
+
+        leftContainer.append(text);
+        newNode.append(leftContainer, text2);
+        newNode.addEventListener('click', (e) => {
+            /* openModal(name, flag); openCountry(name, flag); */
+
+            if (e.target.name === "Country") {
+                searchInput.value = country + ": ";
+                search();
+            }
+        });
+        document.getElementById("regions").append(newNode);
     }
 
     // --- Map Logic ---
@@ -367,7 +421,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     function dateFromText(text) {
         const [month, year] = text.split(" ");
-        return new Date(parseInt(year), monthNames.indexOf(month));
+        return new Date(parseInt(year), months.indexOf(month));
     }
 
     // --- Event Listeners ---
@@ -404,4 +458,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     getCountries();
     await loadData();
     initializeMap();
+
+    switchTab('regions');
 });
