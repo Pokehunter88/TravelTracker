@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const url = new URL(window.location.href);
             const id = url.hash.replace(/^#/, '');
 
-            const countryInfoResponse = await fetch('countryInfo.txt', { cache: "force-cache" });
+            const countryInfoResponse = await fetch('datasets/countryInfo.txt', { cache: "force-cache" });
             const countryInfoText = await countryInfoResponse.text();
             countryInfoText.split('\n').forEach(line => {
                 if (line.startsWith('#') || line.trim() === '') return;
@@ -58,8 +58,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                     });
                     createItem(countryName, countryCode, columns[8].toLowerCase(), visitedCountries.includes(countryCode));
                     if (id === countryCode.toLowerCase() && layer) {
-                        setTimeout(() => openCountry(countryName, countryCode), 100);
+                        console.log("test")
+                        setTimeout(() => {
+                            openCountry(countryName, countryCode);
+
+                            document.getElementById("country-" + countryCode.toLowerCase()).scrollIntoView();
+                        }, 100);
                     } else if (id === countryCode.toLowerCase()) {
+                        console.log("test2")
                         countryToOpen = [countryName, countryCode];
                     }
                 }
@@ -301,7 +307,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                     element.style.transition = "max-width 0.5s ease-in-out, left 0.5s ease-in-out";
                 }, 1);
                 if (countryToOpen) {
-                    setTimeout(() => openCountry(countryToOpen[0], countryToOpen[1]), 100);
+                    setTimeout(() => {
+                        openCountry(countryToOpen[0], countryToOpen[1])
+
+                        document.getElementById("country-" + countryToOpen[1]).scrollIntoView();
+                    }, 100);
                 }
             });
     }
@@ -399,6 +409,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         fromButton.textContent = "From";
         toButton.textContent = "To";
         modal.classList.remove('hidden');
+
+        const addToWishlistButton = document.getElementById('add-to-wishlist');
+        if (saveData.countryWishlist && saveData.countryWishlist[countryCode]) {
+            addToWishlistButton.textContent = "Added to Wishlist";
+            addToWishlistButton.classList.remove("bg-blue-500", "hover:bg-blue-700");
+            addToWishlistButton.classList.add("bg-green-500");
+        } else {
+            addToWishlistButton.textContent = "Add to Wishlist";
+            addToWishlistButton.classList.remove("bg-green-500");
+            addToWishlistButton.classList.add("bg-blue-500", "hover:bg-blue-700");
+        }
     }
 
     function closeModal() {
@@ -450,14 +471,27 @@ document.addEventListener("DOMContentLoaded", async () => {
         openModal(countryNameEl.textContent, countryNameEl.name);
     });
 
+    document.getElementById('add-to-wishlist').addEventListener('click', () => {
+        const saveData = getSaveData();
+        const countryCode = modalCountryName.name;
+        if (!saveData.countryWishlist) {
+            saveData.countryWishlist = {};
+        }
+        saveData.countryWishlist[countryCode] = true;
+        localStorage.setItem("saveData", JSON.stringify(saveData));
+
+        const addToWishlistButton = document.getElementById('add-to-wishlist');
+        addToWishlistButton.textContent = "Added to Wishlist";
+        addToWishlistButton.classList.remove("bg-blue-500", "hover:bg-blue-700");
+        addToWishlistButton.classList.add("bg-green-500");
+    });
+
 
 
     visitedOnlyCheckbox.addEventListener('change', search);
 
     // --- Initialization ---
+    initializeMap();
     getCountries();
     await loadData();
-    initializeMap();
-
-    switchTab('regions');
 });
