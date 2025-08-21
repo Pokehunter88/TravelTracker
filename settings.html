@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
+    <link rel="stylesheet" as="style" onload="this.rel='stylesheet'"
+        href="https://fonts.googleapis.com/css2?display=swap&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&amp;family=Space+Grotesk%3Awght%40400%3B500%3B700" />
+
+    <title>Settings - Travel Tracker</title>
+    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <style>
+        body {
+            touch-action: manipulation;
+            overflow: hidden;
+            height: 100dvh;
+        }
+
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #00000000;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: #2e363e;
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-corner {
+            background: #161a1d;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="relative flex min-h-[100dvh] flex-col bg-[#161a1d] dark group/design-root"
+        style='--checkbox-tick-svg: url(&apos;data:image/svg+xml,%3csvg viewBox=%270 0 16 16%27 fill=%27rgb(22,26,29)%27 xmlns=%27http://www.w3.org/2000/svg%27%3e%3cpath d=%27M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z%27/%3e%3c/svg%3e&apos;); font-family: "Space Grotesk", "Noto Sans", sans-serif;'>
+        <header
+            class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#2e363e] px-5 py-3 w-full z-20 bg-[#161a1d]">
+            <div class="flex items-center gap-4 text-white">
+                <div class="size-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor"
+                        class="bi bi-globe" style="transform: translate(-5px, -5px);" viewBox="0 0 16 16">
+                        <path
+                            d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m7.5-6.923c-.67.204-1.335.82-1.887 1.855A8 8 0 0 0 5.145 4H7.5zM4.09 4a9.3 9.3 0 0 1 .64-1.539 7 7 0 0 1 .597-.933A7.03 7.03 0 0 0 2.255 4zm-.582 3.5c.03-.877.138-1.718.312-2.5H1.674a7 7 0 0 0-.656 2.5zM4.847 5a12.5 12.5 0 0 0-.338 2.5H7.5V5zM8.5 5v2.5h2.99a12.5 12.5 0 0 0-.337-2.5zM4.51 8.5a12.5 12.5 0 0 0 .337 2.5H7.5V8.5zm3.99 0V11h2.653c.187-.765.306-1.608.338-2.5zM5.145 12q.208.58.468 1.068c.552 1.035 1.218 1.65 1.887 1.855V12zm.182 2.472a7 7 0 0 1-.597-.933A9.3 9.3 0 0 1 4.09 12H2.255a7 7 0 0 0 3.072 2.472M3.82 11a13.7 13.7 0 0 1-.312-2.5h-2.49c.062.89.291 1.733.656 2.5zm6.853 3.472A7 7 0 0 0 13.745 12H11.91a9.3 9.3 0 0 1-.64 1.539 7 7 0 0 1-.597.933M8.5 12v2.923c.67-.204 1.335-.82 1.887-1.855q.26-.487.468-1.068zm3.68-1h2.146c.365-.767.594-1.61.656-2.5h-2.49a13.7 13.7 0 0 1-.312 2.5m2.802-3.5a7 7 0 0 0-.656-2.5H12.18c.174.782.282 1.623.312 2.5zM11.27 2.461c.247.464.462.98.64 1.539h1.835a7 7 0 0 0-3.072-2.472c.218.284.418.598.597.933M10.855 4a8 8 0 0 0-.468-1.068C9.835 1.897 9.17 1.282 8.5 1.077V4z" />
+                    </svg>
+                </div>
+                <a class="text-white text-lg font-bold leading-tight tracking-[-0.015em]" href="/index.html">Travel
+                    Tracker</a>
+            </div>
+            <div class="flex flex-1 justify-end gap-5">
+                <div
+                    class="grid grid-cols-2 grid-rows-2 px-2 md:grid-cols-4 md:grid-rows-1 items-center gap-x-5 gap-y-1">
+                    <a class="text-white text-sm font-medium leading-normal" href="/list.html">Countries</a>
+                    <a class="text-white text-sm font-medium leading-normal" href="/timeline.html">Timeline</a>
+                    <a class="text-white text-sm font-medium leading-normal" href="/wishlist.html">Wishlist</a>
+                    <a class="text-white text-sm font-medium leading-normal" href="/map.html">Map</a>
+                </div>
+                <div class="flex items-center text-white">
+                    <a href="settings.html">
+                        <div class="size-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor"
+                                class="bi bi-globe cursor-pointer" style="transform: translate(-5px, -5px);"
+                                viewBox="0 0 682.667 682.667">
+                                <g>
+                                    <defs>
+                                        <clipPath id="a" clipPathUnits="userSpaceOnUse">
+                                            <path d="M0 512h512V0H0Z" fill="#000000" opacity="1"
+                                                data-original="#000000"></path>
+                                        </clipPath>
+                                    </defs>
+                                    <g clip-path="url(#a)" transform="matrix(1.33333 0 0 -1.33333 0 682.667)">
+                                        <path
+                                            d="M0 0a191.783 191.783 0 0 0 49.719-20.638l15.688 15.69a32.121 32.121 0 0 0 22.727 9.415 32.116 32.116 0 0 0 22.718-9.415l22.718-22.719a32.11 32.11 0 0 0 9.415-22.718 32.113 32.113 0 0 0-9.415-22.726L117.881-88.8a191.838 191.838 0 0 0 20.638-49.719h22.147c17.746 0 32.134-14.388 32.134-32.133v-32.134c0-17.745-14.388-32.133-32.134-32.133h-22.147a191.831 191.831 0 0 0-20.638-49.718l15.689-15.689a32.117 32.117 0 0 0 9.415-22.727 32.11 32.11 0 0 0-9.415-22.718l-22.718-22.718a32.112 32.112 0 0 0-22.718-9.415 32.117 32.117 0 0 0-22.727 9.415L49.719-352.8A191.78 191.78 0 0 0 0-373.437v-22.148c0-17.746-14.388-32.134-32.134-32.134h-32.133c-17.746 0-32.133 14.388-32.133 32.134v22.148a191.78 191.78 0 0 0-49.719 20.637l-15.689-15.689a32.115 32.115 0 0 0-22.726-9.415 32.108 32.108 0 0 0-22.718 9.415l-22.719 22.718a32.114 32.114 0 0 0-9.415 22.718 32.121 32.121 0 0 0 9.415 22.727l15.69 15.689a191.796 191.796 0 0 0-20.638 49.718h-22.147c-17.746 0-32.134 14.388-32.134 32.133v32.134c0 17.745 14.388 32.133 32.134 32.133h22.147A191.803 191.803 0 0 0-214.281-88.8l-15.69 15.689a32.117 32.117 0 0 0-9.415 22.726 32.114 32.114 0 0 0 9.415 22.718l22.719 22.719a32.112 32.112 0 0 0 22.718 9.415 32.119 32.119 0 0 0 22.726-9.415l15.689-15.69A191.783 191.783 0 0 0-96.4 0v22.148c0 17.746 14.387 32.133 32.133 32.133h32.133C-14.388 54.281 0 39.894 0 22.148Z"
+                                            style="stroke-width:30;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+                                            transform="translate(304.2 442.719)" fill="none" stroke="#FFFFFF"
+                                            stroke-width="30" stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-miterlimit="10" stroke-dasharray="none" stroke-opacity=""
+                                            data-original="#FFFFFF" class=""></path>
+                                        <path
+                                            d="M0 0c53.205 0 96.4-43.195 96.4-96.4 0-53.204-43.195-96.4-96.4-96.4-53.205 0-96.4 43.196-96.4 96.4C-96.4-43.195-53.205 0 0 0Z"
+                                            style="stroke-width:30;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+                                            transform="translate(256 352.4)" fill="none" stroke="#FFFFFF"
+                                            stroke-width="30" stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-miterlimit="10" stroke-dasharray="none" stroke-opacity=""
+                                            data-original="#00FFFFFF0000" class=""></path>
+                                    </g>
+                                </g>
+                            </svg>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </header>
+        <div class="px-10 flex flex-1 justify-center py-5">
+            <div
+                class="layout-content-container flex flex-col flex-1 max-w-[960px] transition overflow-scroll h-[85dvh]">
+                <div class="px-4 py-3 text-white">
+                    <h1 class="text-2xl font-bold mb-4">Settings</h1>
+                    <div class="section mb-4">
+                        <h2 class="text-xl font-bold">Export Data</h2>
+                        <p class="text-gray-400">Copy the text below to back up your data.</p>
+                        <textarea id="export-data" readonly
+                            class="w-full h-40 bg-[#2e363e] text-white p-2 rounded-md mt-2"></textarea>
+                        <button id="export-btn"
+                            class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded mt-2">Export</button>
+                        <div id="export-message" class="mt-2"></div>
+                    </div>
+                    <div class="section">
+                        <h2 class="text-xl font-bold">Import Data</h2>
+                        <p class="text-gray-400">Paste your data below and click import. This will overwrite any
+                            existing data.</p>
+                        <textarea id="import-data"
+                            class="w-full h-40 bg-[#2e363e] text-white p-2 rounded-md mt-2"></textarea>
+                        <button id="import-btn"
+                            class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mt-2">Import</button>
+                        <div id="import-message" class="mt-2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="js/settings.js"></script>
+    </div>
+</body>
+
+</html>
