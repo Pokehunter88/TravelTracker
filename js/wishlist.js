@@ -8,9 +8,18 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     function getSaveData() {
         try {
-            return JSON.parse(localStorage.getItem("saveData")) || { countryVisits: [], countryWishlist: {} };
+            const saveData = JSON.parse(localStorage.getItem("saveData") ?? { countryVisits: [], countryWishlists: [] });
+
+            if (saveData.countryVisits === undefined) {
+                saveData.countryVisits = [];
+            }
+            if (saveData.countryWishlists === undefined) {
+                saveData.countryWishlists = [];
+            }
+
+            return saveData;
         } catch (e) {
-            return { countryVisits: [], countryWishlist: {} };
+            return { countryVisits: [], countryWishlists: [] };
         }
     }
 
@@ -65,9 +74,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     async function loadWishlist() {
         const saveData = getSaveData();
-        const wishlist = saveData.countryWishlist;
+        const wishlist = saveData.countryWishlists.map(visit => visit.country).reduce(function (a, b) {
+            if (a.indexOf(b) < 0) a.push(b);
+            return a;
+        }, []);
 
-        if (Object.keys(wishlist).length === 0) {
+        console.log(wishlist);
+
+        if (wishlist.length === 0) {
             const emptyMessage = document.createElement("p");
             emptyMessage.className = "text-white text-center text-lg";
             emptyMessage.textContent = "Your wishlist is empty.";
@@ -95,35 +109,32 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
 
         for (const countryCode in wishlist) {
-            if (wishlist[countryCode]) {
-                const countryData = countryInfoMap.get(countryCode);
-                if (countryData) {
-                    createItem(countryData.name, countryCode, countryData.continent, false);
-                }
+            const countryData = countryInfoMap.get(wishlist[countryCode]);
+            if (countryData) {
+                createItem(countryData.name, wishlist[countryCode], countryData.continent, false);
             }
         }
     }
 
     function countryStyle(feature) {
         const isoCode = feature.properties["ISO_A2_EH"];
-        console.log(visitedCountries);
         const isVisited = visitedCountries.includes(isoCode.toUpperCase());
         const isCurrent = currentCountry === isoCode.toLowerCase();
-        const isWishlisted = getSaveData().countryWishlist[isoCode.toLowerCase()];
+        const isWishlisted = getSaveData().countryWishlists.map(visit => visit.country).includes(isoCode.toLowerCase());
 
         let color = '#2e363e';
         let weight = 1;
 
-        if (isVisited) {
-            color = '#0ea5e9'; // visited
-            weight = 2;
-        }
+        // if (isVisited) {
+        //     color = '#0ea5e9'; // visited
+        //     weight = 2;
+        // }
         if (isWishlisted) {
-            color = '#00c951'; // wishlisted
+            color = '#FFFFFF'; // selected
             weight = 2;
         }
         if (isCurrent) {
-            color = '#FFFFFF'; // selected
+            color = '#00c951'; // wishlisted
             weight = 3;
         }
 
