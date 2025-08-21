@@ -13,9 +13,18 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     function getSaveData() {
         try {
-            return JSON.parse(localStorage.getItem("saveData") ?? "invalid");
+            const saveData = JSON.parse(localStorage.getItem("saveData") ?? { countryVisits: [], countryWishlists: [] });
+
+            if (saveData.countryVisits === undefined) {
+                saveData.countryVisits = [];
+            }
+            if (saveData.countryWishlists === undefined) {
+                saveData.countryWishlists = [];
+            }
+
+            return saveData;
         } catch (e) {
-            return { countryVisits: [], countryWishlist: {} };
+            return { countryVisits: [], countryWishlists: [] };
         }
     }
 
