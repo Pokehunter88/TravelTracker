@@ -175,7 +175,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     function loadCountries() {
-        fetch('/ne_50m_admin_0_countries.geojson', { cache: "force-cache" })
+        fetch('ne_50m_admin_0_countries.geojson', { cache: "force-cache" })
             .then(res => res.json())
             .then(data => {
                 if (layer) map.removeLayer(layer);

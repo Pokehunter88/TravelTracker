@@ -391,7 +391,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             attributionControl: false
         }).setView([0, 0], 1);
 
-        fetch('/ne_50m_admin_0_countries.geojson', { cache: "force-cache" })
+        fetch('ne_50m_admin_0_countries.geojson', { cache: "force-cache" })
             .then(res => res.json())
             .then(data => {
                 geoJsonLayer = L.geoJSON(data, {
