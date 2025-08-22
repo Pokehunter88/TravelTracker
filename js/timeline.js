@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     async function loadCountryData() {
         try {
-            const countryInfoResponse = await fetch('countryInfo.txt');
+            const countryInfoResponse = await fetch('datasets/countryInfo.txt');
             const countryInfoText = await countryInfoResponse.text();
             countryInfoText.split('\n').forEach(line => {
                 if (line.startsWith('#') || line.trim() === '') {
