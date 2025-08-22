@@ -1,9 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
     // --- DOM Elements ---
-    const slider = document.getElementById('main-tab-slider');
-    const countriesContent = document.getElementById('countries-content');
-    const citiesContent = document.getElementById('cities-content');
-    const regionsContent = document.getElementById('regions-content');
     const slider2 = document.getElementById('type-tab-slider');
     const visitContent = document.getElementById('visit-content');
     const wishlistContent = document.getElementById('wishlist-content');
@@ -70,53 +66,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                     }
                 }
             });
-
-            const cities15000Response = await fetch('cities15000.txt', { cache: "force-cache" });
-            const cities15000Text = await cities15000Response.text();
-            cities15000Text.split('\n').forEach(line => {
-                if (line.startsWith('#') || line.trim() === '') return;
-                const columns = line.split('\t');
-                if (columns.length > 4) {
-                    const cityName = columns[2];
-                    const cityName2 = columns[1];
-                    const countryCode = columns[8];
-                    if (countryCode === "FR") {
-                        createItemCity(cityName, cityName2, countryCode, false);
-                    }
-                }
-            });
-
-            const regionsResponse = await fetch('ne_50m_admin_1_states_provinces.geojson', { cache: "force-cache" });
-            const regionsData = await regionsResponse.json();
-            regionsData.features.forEach(feature => {
-                const regionName = feature.properties.name;
-                const countryCode = feature.properties.iso_a2;
-                createItemRegion(regionName, countryInfoMap.get(countryCode.toLowerCase()).name, false);
-            });
         } catch (error) { console.error('Error loading data:', error); }
     }
 
     // --- UI & Tab Management ---
     function switchTab(tab) {
         const tabActions = {
-            'countries': () => {
-                slider.style.transform = 'translateX(0)';
-                countriesContent.classList.remove('hidden');
-                citiesContent.classList.add('hidden');
-                regionsContent.classList.add('hidden');
-            },
-            'cities': () => {
-                slider.style.transform = 'translateX(100%)';
-                countriesContent.classList.add('hidden');
-                citiesContent.classList.remove('hidden');
-                regionsContent.classList.add('hidden');
-            },
-            'regions': () => {
-                slider.style.transform = 'translateX(200%)';
-                countriesContent.classList.add('hidden');
-                citiesContent.classList.add('hidden');
-                regionsContent.classList.remove('hidden');
-            },
             'visit': () => {
                 slider2.style.transform = 'translateX(0)';
                 visitContent.classList.remove('hidden');
@@ -172,34 +127,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                     title.style.display = visibleItems > 0 ? "" : "none";
                 }
             });
-        } else if (currentTab === "cities") {
-            const list = document.getElementById('cities');
-            const items = list.getElementsByTagName('label');
-            for (let i = 0; i < items.length; i++) {
-                const p = items[i].getElementsByTagName('p')[0];
-                const txtValue = p.textContent || p.innerText;
-                items[i].style.display = txtValue.toUpperCase().indexOf(filter) > -1 ? "" : "none";
-            }
-        } else if (currentTab === "regions") {
-            const list = document.getElementById('regions');
-            const items = list.getElementsByTagName('label');
-            for (let i = 0; i < items.length; i++) {
-                const elements = items[i].getElementsByTagName('p');
-                const p = elements[0];
-                const p2 = elements[1];
-                const txtValue = p.textContent || p.innerText;
-                const txtValue2 = p2.textContent || p2.innerText;
-
-                if (filter.includes(":")) {
-                    const split = filter.split(":");
-                    const part1 = split[0];
-                    const part2 = split[1][0] === " " ? split[1].substring(1) : split[1];
-
-                    items[i].style.display = txtValue.toUpperCase().indexOf(part2) > -1 & txtValue2.toUpperCase().indexOf(part1) > -1 ? "" : "none";
-                } else {
-                    items[i].style.display = txtValue.toUpperCase().indexOf(filter) > -1 || txtValue2.toUpperCase().indexOf(filter) > -1 ? "" : "none";
-                }
-            }
         }
     }
     window.search = search;
@@ -225,60 +152,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         newNode.append(leftContainer);
         newNode.addEventListener('click', () => openCountry(name, flag));
         document.getElementById(continent).append(newNode);
-    }
-
-    function createItemCity(name, secondName, country, visited) {
-        const newNode = document.createElement("label");
-        newNode.className = `flex justify-between items-center cursor-pointer rounded-lg px-3 py-3 transition-colors ${visited ? 'bg-[#00FF0036] hover:bg-[#00FF0083]' : 'hover:bg-[#2e363e]'}`;
-        newNode.id = "city-" + name;
-        newNode.classList.add("city-" + country);
-
-        const leftContainer = document.createElement("div");
-        leftContainer.className = "flex flex-row items-center gap-x-3";
-
-        const text = document.createElement("p");
-        text.className = "text-white text-base font-normal leading-normal peer-checked:text-[#dbe5ef]";
-        text.textContent = name;
-
-        const text2 = document.createElement("p");
-        text2.className = "text-gray-500 text-base font-normal leading-normal peer-checked:text-[#dbe5ef]";
-        text2.textContent = secondName;
-
-        leftContainer.append(text);
-        newNode.append(leftContainer, text2);
-        newNode.addEventListener('click', () => { /* openModal(name, flag); openCountry(name, flag); */ });
-        document.getElementById("cities").append(newNode);
-    }
-
-    function createItemRegion(name, country, visited) {
-        const newNode = document.createElement("label");
-        newNode.className = `flex justify-between items-center cursor-pointer rounded-lg p-2 transition-colors ${visited ? 'bg-[#00FF0036] hover:bg-[#00FF0083]' : 'hover:bg-[#2e363e]'}`;
-        newNode.id = "region-" + name;
-        newNode.classList.add("region-" + country.replaceAll(" ", "-"));
-
-        const leftContainer = document.createElement("div");
-        leftContainer.className = "flex flex-row items-center gap-x-3";
-
-        const text = document.createElement("p");
-        text.className = "text-white text-base font-normal leading-normal peer-checked:text-[#dbe5ef]";
-        text.textContent = name;
-
-        const text2 = document.createElement("p");
-        text2.className = "text-gray-500 text-base font-normal leading-normal peer-checked:text-[#dbe5ef] hover:bg-[#FFFFFF10] underline py-1 px-3 transition rounded";
-        text2.name = "Country";
-        text2.textContent = country;
-
-        leftContainer.append(text);
-        newNode.append(leftContainer, text2);
-        newNode.addEventListener('click', (e) => {
-            /* openModal(name, flag); openCountry(name, flag); */
-
-            if (e.target.name === "Country") {
-                searchInput.value = country + ": ";
-                search();
-            }
-        });
-        document.getElementById("regions").append(newNode);
     }
 
     // --- Map Logic ---
