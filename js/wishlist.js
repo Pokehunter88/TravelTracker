@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     function createItem(name, flag, continent, visited) {
         const newNode = document.createElement("label");
-        newNode.className = `flex justify-between items-center cursor-pointer rounded-lg px-3 py-3 transition-colors hover:bg-[#2e363e]`;
+        newNode.className = `flex justify-between items-center cursor-pointer rounded-lg px-3 py-3 transition-colors ${visited ? 'bg-[#2b7fff4f] hover:bg-[#1447e64f]' : 'hover:bg-[#2e363e]'}`;
         newNode.id = "country-" + flag;
 
         const leftContainer = document.createElement("div");
@@ -78,8 +78,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (a.indexOf(b) < 0) a.push(b);
             return a;
         }, []);
-
-        console.log(wishlist);
 
         if (wishlist.length === 0) {
             const emptyMessage = document.createElement("p");
@@ -111,7 +109,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         for (const countryCode in wishlist) {
             const countryData = countryInfoMap.get(wishlist[countryCode]);
             if (countryData) {
-                createItem(countryData.name, wishlist[countryCode], countryData.continent, false);
+                createItem(countryData.name, wishlist[countryCode], countryData.continent, saveData.countryVisits.filter(visit => visit.country === wishlist[countryCode].toLowerCase()).length > 0);
             }
         }
     }
