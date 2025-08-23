@@ -49,7 +49,6 @@
 #																		
 #ISO	ISO3	ISO-Numeric	fips	Country	Capital	Area(in sq km)	Population	Continent	tld	CurrencyCode	CurrencyName	Phone	Postal Code Format	Postal Code Regex	Languages	geonameid	neighbours	EquivalentFipsCode
 AD	AND	020	AN	Andorra	Andorra la Vella	468	77006	EU	.ad	EUR	Euro	376	AD###	^(?:AD)*(\d{3})$	ca	3041565	ES,FR	
-AE	ARE	784	AE	United Arab Emirates	Abu Dhabi	82880	9630959	AS	.ae	AED	Dirham	971	##### #####	^\d{5}-\d{5}$	ar-AE,fa,en,hi,ur	290557	SA,OM	
 AF	AFG	004	AF	Afghanistan	Kabul	647500	37172386	AS	.af	AFN	Afghani	93			fa-AF,ps,uz-AF,tk	1149361	TM,CN,IR,TJ,PK,UZ	
 AG	ATG	028	AC	Antigua and Barbuda	St. John's	443	96286	NA	.ag	XCD	Dollar	+1-268			en-AG	3576396			
 AL	ALB	008	AL	Albania	Tirana	28748	2866376	EU	.al	ALL	Lek	355	####	^(\d{4})$	sq,el	783754	MK,GR,ME,RS,XK	
@@ -232,6 +231,7 @@ TW	TWN	158	TW	Taiwan	Taipei	35980	23451837	AS	.tw	TWD	Dollar	886	#####	^(\d{5})$
 TZ	TZA	834	TZ	Tanzania	Dodoma	945087	56318348	AF	.tz	TZS	Shilling	255			sw-TZ,en,ar	149590	MZ,KE,CD,RW,ZM,BI,UG,MW	
 UA	UKR	804	UP	Ukraine	Kyiv	603700	44622516	EU	.ua	UAH	Hryvnia	380	#####	^(\d{5})$	uk,ru-UA,rom,pl,hu	690791	PL,MD,HU,SK,BY,RO,RU	
 UG	UGA	800	UG	Uganda	Kampala	236040	42723139	AF	.ug	UGX	Shilling	256			en-UG,lg,sw,ar	226074	TZ,KE,SS,CD,RW	
+AE	ARE	784	AE	United Arab Emirates	Abu Dhabi	82880	9630959	AS	.ae	AED	Dirham	971	##### #####	^\d{5}-\d{5}$	ar-AE,fa,en,hi,ur	290557	SA,OM	
 US	USA	840	US	United States	Washington	9629091	327167434	NA	.us	USD	Dollar	1	#####-####	^\d{5}(-\d{4})?$	en-US,es-US,haw,fr	6252001	CA,MX,CU	
 UY	URY	858	UY	Uruguay	Montevideo	176220	3449299	SA	.uy	UYU	Peso	598	#####	^(\d{5})$	es-UY	3439705	BR,AR	
 UZ	UZB	860	UZ	Uzbekistan	Tashkent	447400	32955400	AS	.uz	UZS	Som	998	######	^(\d{6})$	uz,ru,tg	1512440	TM,AF,KG,TJ,KZ	

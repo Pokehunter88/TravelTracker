@@ -115,7 +115,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     const txtValue = p.textContent || p.innerText;
                     const isVisited = visitedCountries.includes(items[i].id.replace("country-", ""));
                     const isWishlisted = wishlistedCountries.includes(items[i].id.replace("country-", ""));
-                    if (txtValue.toUpperCase().indexOf(filter) > -1 && (visitedOnly ? (wishlistedOnly ? isVisited && isWishlisted : isVisited) : (wishlistedOnly ? isWishlisted : true))) {
+                    if (txtValue.toUpperCase().indexOf(filter) > -1 && (visitedOnly ? (wishlistedOnly ? isVisited || isWishlisted : isVisited) : (wishlistedOnly ? isWishlisted : true))) {
                         items[i].style.display = "";
                         visibleItems++;
                     } else {
@@ -134,7 +134,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // --- Item Creation ---
     function createItem(name, flag, continent, visited, wishlisted) {
         const newNode = document.createElement("label");
-        newNode.className = `flex justify-between items-center cursor-pointer rounded-lg px-3 py-3 transition-colors ${visited ? (wishlisted ? 'bg-[#2db0ae4f] hover:bg-[#009c994f]' : 'bg-[#2b7fff4f] hover:bg-[#1447e64f]') : (wishlisted ? 'bg-[#2fff2b4f] hover:bg-[#03ca004f]' : 'hover:bg-[#2e363e]')}`;
+        newNode.className = `flex justify-between items-center cursor-pointer rounded-lg px-3 py-3 transition-colors ${visited ? (wishlisted ? 'bg-[var(--mix-color)] hover:bg-[var(--mix-hover-color)]' : 'bg-[var(--visit-color)] hover:bg-[var(--visit-hover-color)]') : (wishlisted ? 'bg-[var(--wishlist-color)] hover:bg-[var(--wishlist-hover-color)]' : 'hover:bg-[#2e363e]')}`;
         newNode.id = "country-" + flag;
 
         const leftContainer = document.createElement("div");
@@ -272,7 +272,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             removeButton.onclick = () => {
                 saveData.countryVisits.splice(saveData.countryVisits.indexOf(visit), 1);
                 if (saveData.countryVisits.filter(v => v.country === countryCode).length === 0) {
-                    document.getElementById(`country-${countryCode}`).className = `flex cursor-pointer items-center gap-x-3 rounded-lg px-3 py-3 transition-colors ${countryWishlists.length > 0 ? "bg-[#2fff2b4f] hover:bg-[#03ca004f]" : "hover:bg-[#2e363e]"}`;
+                    document.getElementById(`country-${countryCode}`).className = `flex cursor-pointer items-center gap-x-3 rounded-lg px-3 py-3 transition-colors ${countryWishlists.length > 0 ? "bg-[var(--wishlist-color)] hover:bg-[var(--wishlist-hover-color)]" : "hover:bg-[#2e363e]"}`;
                 }
                 localStorage.setItem('saveData', JSON.stringify(saveData));
                 openModal(countryName, countryCode);
@@ -299,7 +299,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const to = new Date(visit.to);
                 textLabel = `${months[from.getMonth()]} ${from.getFullYear() === to.getFullYear() ? '' : from.getFullYear()} > ${months[to.getMonth()]} ${to.getFullYear()}`;
             } else {
-                textLabel = "Visited";
+                textLabel = "Wishlisted";
             }
             listItem.appendChild(document.createTextNode(textLabel));
 
@@ -309,7 +309,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             removeButton.onclick = () => {
                 saveData.countryWishlists.splice(saveData.countryWishlists.indexOf(visit), 1);
                 if (saveData.countryWishlists.filter(v => v.country === countryCode).length === 0) {
-                    document.getElementById(`country-${countryCode}`).className = `flex cursor-pointer items-center gap-x-3 rounded-lg px-3 py-3 transition-colors ${countryVisits.length > 0 ? "bg-[#2b7fff4f] hover:bg-[#1447e64f]" : "hover:bg-[#2e363e]"}`;
+                    document.getElementById(`country-${countryCode}`).className = `flex cursor-pointer items-center gap-x-3 rounded-lg px-3 py-3 transition-colors ${countryVisits.length > 0 ? "bg-[var(--visit-color)] hover:bg-[var(--visit-hover-color)]" : "hover:bg-[#2e363e]"}`;
                 }
                 localStorage.setItem('saveData', JSON.stringify(saveData));
 
@@ -385,7 +385,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const countryWishlists = saveData.countryWishlists.filter(visit => visit.country === modalCountryName.name);
 
-        document.getElementById(`country-${modalCountryName.name}`).className = `flex cursor-pointer items-center gap-x-3 rounded-lg px-3 py-3 transition-colors ${countryWishlists.length > 0 ? "bg-[#2db0ae4f] hover:bg-[#009c994f]" : "bg-[#2b7fff4f] hover:bg-[#1447e64f]"}`;
+        document.getElementById(`country-${modalCountryName.name}`).className = `flex cursor-pointer items-center gap-x-3 rounded-lg px-3 py-3 transition-colors ${countryWishlists.length > 0 ? "bg-[var(--mix-color)] hover:bg-[var(--mix-hover-color)]" : "bg-[var(--visit-color)] hover:bg-[var(--visit-hover-color)]"}`;
         openModal(modalCountryName.textContent, modalCountryName.name);
         getCountries();
         updateCheckmark(modalCountryName.name);
@@ -412,7 +412,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const countryVisits = saveData.countryVisits.filter(visit => visit.country === modalCountryName.name);
 
-        document.getElementById(`country-${modalCountryName.name}`).className = `flex cursor-pointer items-center gap-x-3 rounded-lg px-3 py-3 transition-colors ${countryVisits.length > 0 ? "bg-[#2db0ae4f] hover:bg-[#009c994f]" : "bg-[#2fff2b4f] hover:bg-[#03ca004f]"}`;
+        document.getElementById(`country-${modalCountryName.name}`).className = `flex cursor-pointer items-center gap-x-3 rounded-lg px-3 py-3 transition-colors ${countryVisits.length > 0 ? "bg-[var(--mix-color)] hover:bg-[var(--mix-hover-color)]" : "bg-[var(--wishlist-color)] hover:bg-[var(--wishlist-hover-color)]"}`;
 
         fromButton.textContent = "From";
         toButton.textContent = "To";
@@ -420,10 +420,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         getCountries();
     });
 
-
-
-    visitedOnlyCheckbox.addEventListener('change', search);
-    wishlistedOnlyCheckbox.addEventListener('change', search);
+    visitedOnlyCheckbox.addEventListener('change', () => {
+        wishlistedOnlyCheckbox.checked = false;
+        search();
+    });
+    wishlistedOnlyCheckbox.addEventListener('change', () => {
+        visitedOnlyCheckbox.checked = false;
+        search();
+    });
 
     // --- Initialization ---
     initializeMap();

@@ -50,6 +50,18 @@
     :root {
       --container-width: 0px;
       --off-screen: 5000px;
+
+      --visit-color: #2fff2b4f;
+      --visit-hover-color: #03ca004f;
+      --wishlist-color: #2b7fff4f;
+      --wishlist-hover-color: #1447e64f;
+      --mix-color: #2db0ae4f;
+      --mix-hover-color: #009c994f;
+
+      --visit-button-color: #3b82f6;
+      --visit-button-hover-color: #2563eb;
+      --wishlist-button-color: #22c55e;
+      --wishlist-button-hover-color: #16a34a;
     }
 
     .country-information {
@@ -218,7 +230,7 @@
                 class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden text-white focus:outline-0 focus:ring-0 border-none bg-transparent h-full placeholder:text-[#a1adba] px-2 text-base font-normal leading-normal"
                 value="" onkeyup="search()" id="search-input" />
 
-              <div class="flex items-center gap-2 flex-col sm:flex-row m-3">
+              <div class="flex items-center gap-2 flex-col lg:flex-row m-3">
                 <div class="flex items-center gap-2">
                   <label for="visited-countries-checkbox"
                     class="text-white text-sm font-medium whitespace-nowrap text-center">Visited</label>
@@ -227,7 +239,7 @@
                     id="visited-countries-checkbox" />
                 </div>
                 <div class="flex items-center gap-2 ml-2">
-                  <label for="visited-countries-checkbox"
+                  <label for="wishlisted-countries-checkbox"
                     class="text-white text-sm font-medium whitespace-nowrap text-center">Wishlisted</label>
                   <input type="checkbox"
                     class="h-5 w-5 rounded border-[#3f4c5a] border-2 bg-transparent text-[#ccdbeb] checked:bg-[#ccdbeb] checked:border-[#ccdbeb] checked:bg-[image:--checkbox-tick-svg] focus:ring-0 focus:ring-offset-0 focus:border-[#3f4c5a] focus:outline-none"
@@ -308,14 +320,14 @@
               <div id="visit-content">
                 <div class="flex justify-center">
                   <button id="add-to-visited"
-                    class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 mb-5 rounded place-self-center transition-all duration-300 ease-in-out">Add
+                    class="bg-[var(--visit-button-color)] hover:bg-[var(--visit-button-hover-color)] text-white font-bold py-2 px-4 mb-5 rounded place-self-center transition-all duration-300 ease-in-out">Add
                     Visit</button>
                 </div>
               </div>
               <div id="wishlist-content" class="hidden">
                 <div class="flex justify-center">
                   <button id="add-to-wishlist"
-                    class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 mb-5 rounded place-self-center transition-all duration-300 ease-in-out">Add
+                    class="bg-[var(--wishlist-button-color)] hover:bg-[var(--wishlist-button-hover-color)] text-white font-bold py-2 px-4 mb-5 rounded place-self-center transition-all duration-300 ease-in-out">Add
                     to
                     Wishlist</button>
                 </div>
@@ -445,7 +457,7 @@
               <button
                 class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 hover:bg-[#4c5967] bg-[#2e363e] transition text-white text-sm font-bold leading-normal tracking-[0.015em] grow"
                 id="visit-button">
-                <span class="truncate">Manage Visits</span>
+                <span class="truncate">Manage Visits And Wishlists</span>
               </button>
               <!-- <button
                 class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#233648] text-white text-sm font-bold leading-normal tracking-[0.015em] grow"

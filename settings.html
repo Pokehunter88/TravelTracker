@@ -127,8 +127,22 @@
                 </div>
             </div>
         </div>
-        <script src="js/settings.js"></script>
     </div>
+    <div id="import-confirm-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+        <div class="bg-[#2e363e] p-6 rounded-md shadow-lg text-white">
+            <h2 class="text-xl font-bold mb-4">Confirm Import</h2>
+            <p>This will overwrite your existing data. Do you want to continue?</p>
+            <div class="mt-4 flex justify-end gap-4">
+                <button id="cancel-import-btn"
+                    class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded">Cancel</button>
+                <button id="merge-import-btn"
+                    class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded">Merge</button>
+                <button id="overwrite-import-btn"
+                    class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">Overwrite</button>
+            </div>
+        </div>
+    </div>
+    <script src="js/settings.js"></script>
 </body>
 
 </html>

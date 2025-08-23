@@ -88,7 +88,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             unknownCountryList[i].className = 'text-lg font-medium text-white text-balance scroll-m-[15dvh] md:scroll-m-[35dvh]';
         }
 
-        countryList[country][1].className = 'text-lg font-medium text-[#0ea5e9] text-balance scroll-m-[15dvh] md:scroll-m-[35dvh]';
+        countryList[country][1].className = 'text-lg font-medium text-[var(--visit-color)] text-balance scroll-m-[15dvh] md:scroll-m-[35dvh]';
     }
 
     function highlightCountryTextUnknown(country) {
@@ -99,7 +99,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             unknownCountryList[i].className = 'text-lg font-medium text-white text-balance scroll-m-[15dvh] md:scroll-m-[35dvh]';
         }
 
-        unknownCountryList[country].className = 'text-lg font-medium text-[#0ea5e9] text-balance scroll-m-[15dvh] md:scroll-m-[35dvh]';
+        unknownCountryList[country].className = 'text-lg font-medium text-[var(--visit-color)] text-balance scroll-m-[15dvh] md:scroll-m-[35dvh]';
     }
 
     function animationLoop() {
@@ -182,7 +182,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         item.addEventListener('click', (e) => {
             if (e.target.nodeName === 'I') {
-                window.location = "/list.html#" + visit.country;
+                window.location = "list.html#" + visit.country;
             } else {
                 highlightCountry(visit.country);
 
@@ -198,7 +198,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
 
         const dot = document.createElement('div');
-        dot.className = 'absolute left-[-28px] top-4 w-4 h-4 bg-sky-500 rounded-full';
+        dot.className = 'absolute left-[-28px] top-4 w-4 h-4 bg-[var(--visit-color)] rounded-full';
         item.appendChild(dot);
 
         const content = document.createElement('div');
@@ -342,7 +342,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             weight = 2;
         }
         if (isCurrent) {
-            color = '#0ea5e9'; // selected
+            color = 'var(--visit-color)'; // selected
             weight = 3;
         }
 
@@ -369,8 +369,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     //             const isoCode = feature.properties["ISO_A2_EH"];
     //             const layer = e.target;
     //             layer.setStyle({
-    //                 fillColor: currentCountry == isoCode.toLowerCase() ? '#0ea5e9' : visitedCountries.includes(isoCode) ? '#FFFFFF' : '#2e363e',
-    //                 color: currentCountry == isoCode.toLowerCase() ? '#0ea5e9' : visitedCountries.includes(isoCode) ? '#FFFFFF' : '#2e363e',
+    //                 fillColor: currentCountry == isoCode.toLowerCase() ? 'var(--visit-color)' : visitedCountries.includes(isoCode) ? '#FFFFFF' : '#2e363e',
+    //                 color: currentCountry == isoCode.toLowerCase() ? 'var(--visit-color)' : visitedCountries.includes(isoCode) ? '#FFFFFF' : '#2e363e',
     //             });
     //         },
     //         click: (e) => {

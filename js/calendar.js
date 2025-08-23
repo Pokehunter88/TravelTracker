@@ -203,8 +203,14 @@ const toButton = document.getElementById('to-button');
 
 let currentDate = "from";
 
-document.getElementById('country-modal').addEventListener("click", () => {
-    calendarEl.classList.add("hidden");
+const modal = document.getElementById('country-modal');
+
+modal.addEventListener("click", (e) => {
+    if (!calendarEl.classList.contains("hidden")) {
+        calendarEl.classList.add("hidden");
+    } else if (e.target.id === "country-modal"){
+        modal.classList.add('hidden');
+    }
 });
 
 document.getElementById('confirm-calendar').addEventListener("click", () => {

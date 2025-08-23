@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     function createItem(name, flag, continent, visited) {
         const newNode = document.createElement("label");
-        newNode.className = `flex justify-between items-center cursor-pointer rounded-lg px-3 py-3 transition-colors ${visited ? 'bg-[#2b7fff4f] hover:bg-[#1447e64f]' : 'hover:bg-[#2e363e]'}`;
+        newNode.className = `flex justify-between items-center cursor-pointer rounded-lg px-3 py-3 transition-colors ${visited ? 'bg-[var(--visit-color)] hover:bg-[var(--visit-hover-color)]' : 'hover:bg-[#2e363e]'}`;
         newNode.id = "country-" + flag;
 
         const leftContainer = document.createElement("div");
@@ -132,7 +132,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             weight = 2;
         }
         if (isCurrent) {
-            color = '#00c951'; // wishlisted
+            color = 'var(--wishlist-color)'; // wishlisted
             weight = 3;
         }
 
