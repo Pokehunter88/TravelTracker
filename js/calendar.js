@@ -3,8 +3,10 @@ const months = [
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
 ];
+const dayWheel = document.getElementById("day-wheel");
 const monthWheel = document.getElementById("month-wheel");
 const yearWheel = document.getElementById("year-wheel");
+const displayDay = document.getElementById("sel-day");
 const displayMonth = document.getElementById("sel-month");
 const displayYear = document.getElementById("sel-year");
 
@@ -36,8 +38,19 @@ for (let y = 1800; y <= 2200; y++) {
     yearWheel.appendChild(el);
 }
 
+function populateDays(year, month) {
+    dayWheel.innerHTML = "";
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    for (let d = 1; d <= daysInMonth; d++) {
+        const el = createOption(String(d), "day", d);
+        dayWheel.appendChild(el);
+    }
+}
+
 // snap configuration via CSS custom property
 // (Tailwind doesn't yet have scroll-snap-y in CDN default so use attributes)
+dayWheel.style.scrollSnapType = "y mandatory";
+dayWheel.style.scrollSnapAlign = "center";
 monthWheel.style.scrollSnapType = "y mandatory";
 monthWheel.style.scrollSnapAlign = "center";
 yearWheel.style.scrollSnapType = "y mandatory";
@@ -81,24 +94,48 @@ function adjustWheelVisuals(container) {
 }
 
 // Update selection state, aria-selected, display
+let currentDayValue = null;
 let currentMonthIndex = null;
 let currentYearValue = null;
 
 function refreshSelection() {
+    const centeredDay = getCenteredOption(dayWheel);
     const centeredMonth = getCenteredOption(monthWheel);
     const centeredYear = getCenteredOption(yearWheel);
-    if (centeredMonth) {
-        const newIdx = parseInt(centeredMonth.dataset.value, 10);
-        if (newIdx !== currentMonthIndex) {
-            currentMonthIndex = newIdx;
-            displayMonth.textContent = months[newIdx];
-        }
-    }
+
+    let yearChanged = false;
+    let monthChanged = false;
+
     if (centeredYear) {
         const newYear = parseInt(centeredYear.dataset.value, 10);
         if (newYear !== currentYearValue) {
             currentYearValue = newYear;
             displayYear.textContent = newYear;
+            yearChanged = true;
+        }
+    }
+
+    if (centeredMonth) {
+        const newIdx = parseInt(centeredMonth.dataset.value, 10);
+        if (newIdx !== currentMonthIndex) {
+            currentMonthIndex = newIdx;
+            displayMonth.textContent = months[newIdx];
+            monthChanged = true;
+        }
+    }
+
+    if (yearChanged || monthChanged) {
+        const currentDay = currentDayValue ? parseInt(currentDayValue, 10) : new Date().getDate();
+        populateDays(currentYearValue, currentMonthIndex);
+        const dEl = dayWheel.querySelector(`.option[data-value="${currentDay}"]`);
+        if (dEl) dEl.scrollIntoView({ block: "center" });
+    }
+
+    if (centeredDay) {
+        const newDay = parseInt(centeredDay.dataset.value, 10);
+        if (newDay !== currentDayValue) {
+            currentDayValue = newDay;
+            displayDay.textContent = newDay;
         }
     }
 }
@@ -109,6 +146,7 @@ function onScroll() {
     if (!tickScheduled) {
         tickScheduled = true;
         requestAnimationFrame(() => {
+            adjustWheelVisuals(dayWheel);
             adjustWheelVisuals(monthWheel);
             adjustWheelVisuals(yearWheel);
             refreshSelection();
@@ -117,6 +155,7 @@ function onScroll() {
     }
 }
 
+dayWheel.addEventListener("scroll", onScroll);
 monthWheel.addEventListener("scroll", onScroll);
 yearWheel.addEventListener("scroll", onScroll);
 
@@ -124,12 +163,17 @@ yearWheel.addEventListener("scroll", onScroll);
 let now = new Date();
 // scroll them into view after a short delay so layout settled
 function onLoad() {
-    const mEl = monthWheel.querySelector(`.option[data-value="${now.getMonth()}"]`);
     const yVal = Math.min(3000, Math.max(0, now.getFullYear()));
+    populateDays(yVal, now.getMonth());
+
+    const dEl = dayWheel.querySelector(`.option[data-value="${now.getDate()}"]`);
+    const mEl = monthWheel.querySelector(`.option[data-value="${now.getMonth()}"]`);
     const yEl = yearWheel.querySelector(`.option[data-value="${yVal}"]`);
+    if (dEl) dEl.scrollIntoView({ block: "center" });
     if (mEl) mEl.scrollIntoView({ block: "center" });
     if (yEl) yEl.scrollIntoView({ block: "center" });
     // initial visual adjustment
+    adjustWheelVisuals(dayWheel);
     adjustWheelVisuals(monthWheel);
     adjustWheelVisuals(yearWheel);
     refreshSelection();
@@ -137,7 +181,7 @@ function onLoad() {
 window.addEventListener("load", onLoad);
 
 // Click outside to allow focus on wheel for keyboard nav
-[monthWheel, yearWheel].forEach(w => {
+[dayWheel, monthWheel, yearWheel].forEach(w => {
     w.setAttribute("tabindex", "0");
     w.addEventListener("focus", () => {
         // do nothing but allow arrow keys to work
@@ -147,6 +191,28 @@ window.addEventListener("load", onLoad);
 // Ensure the "selector-overlay" centers properly: nothing additional needed since it's absolute inside container with padding.
 
 const speedFactor = 0.5; // 1 = normal speed; lower = slower
+
+dayWheel.addEventListener('wheel', function (e) {
+    // needed so we can call preventDefault()
+    e.preventDefault();
+
+    // Normalize delta to pixels
+    let delta = e.deltaY;
+    if (e.deltaMode === 1) { // DOM_DELTA_LINE
+        const lineHeight = parseFloat(getComputedStyle(dayWheel).lineHeight) || 16;
+        delta *= lineHeight;
+    } else if (e.deltaMode === 2) { // DOM_DELTA_PAGE
+        delta *= dayWheel.clientHeight;
+    }
+
+    // Apply slowed scroll
+    dayWheel.scrollTo({
+        top: dayWheel.scrollTop + (delta * speedFactor),
+        left: 0,
+        behavior: "smooth",
+    });
+
+}, { passive: false });
 
 monthWheel.addEventListener('wheel', function (e) {
     // needed so we can call preventDefault()
@@ -193,8 +259,8 @@ yearWheel.addEventListener('wheel', function (e) {
 
 function dateFromText(text) {
     const split = text.split(" ");
-    const monthIndex = months.indexOf(split[0]);
-    return new Date(parseInt(split[1]), monthIndex);
+    const monthIndex = months.indexOf(split[1]);
+    return new Date(parseInt(split[2]), monthIndex, parseInt(split[0]));
 }
 
 const calendarEl = document.querySelector('.calendar');
@@ -217,7 +283,7 @@ document.getElementById('confirm-calendar').addEventListener("click", () => {
     calendarEl.classList.add("hidden");
 
     if (currentDate === "from") {
-        fromButton.textContent = displayMonth.textContent + " " + displayYear.textContent;
+        fromButton.textContent = displayDay.textContent + " " + displayMonth.textContent + " " + displayYear.textContent;
 
         if (toButton.textContent === "To") {
             toButton.textContent = fromButton.textContent;
@@ -230,7 +296,7 @@ document.getElementById('confirm-calendar').addEventListener("click", () => {
             }
         }
     } else {
-        toButton.textContent = displayMonth.textContent + " " + displayYear.textContent;
+        toButton.textContent = displayDay.textContent + " " + displayMonth.textContent + " " + displayYear.textContent;
 
         if (fromButton.textContent === "From") {
             fromButton.textContent = toButton.textContent;

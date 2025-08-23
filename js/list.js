@@ -260,7 +260,29 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (visit.from && visit.to) {
                 const from = new Date(visit.from);
                 const to = new Date(visit.to);
-                textLabel = `${months[from.getMonth()]} ${from.getFullYear() === to.getFullYear() ? '' : from.getFullYear()} > ${months[to.getMonth()]} ${to.getFullYear()}`;
+
+                let fromYear = from.getFullYear();
+                let toYear = to.getFullYear();
+
+                const months = [
+                    "January", "February", "March", "April", "May", "June",
+                    "July", "August", "September", "October", "November", "December"
+                ];
+
+                const fromDay = from.getDate();
+                const fromMonth = months[from.getMonth()];
+                const toDay = to.getDate();
+                const toMonth = months[to.getMonth()];
+
+                if (visit.from === visit.to) {
+                    textLabel = `${fromDay} ${fromMonth}, ${toYear}`;
+                } else if (fromMonth === toMonth && fromYear === toYear) {
+                    textLabel = `${fromDay} - ${toDay} ${fromMonth}, ${fromYear}`;
+                } else if (fromYear === toYear) {
+                    textLabel = `${fromDay} ${fromMonth} - ${toDay} ${toMonth}, ${toYear}`;
+                } else {
+                    textLabel = `${fromDay} ${fromMonth}, ${fromYear} - ${toDay} ${toMonth}, ${toYear}`;
+                }
             } else {
                 textLabel = "Visited";
             }
@@ -297,7 +319,29 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (visit.from && visit.to) {
                 const from = new Date(visit.from);
                 const to = new Date(visit.to);
-                textLabel = `${months[from.getMonth()]} ${from.getFullYear() === to.getFullYear() ? '' : from.getFullYear()} > ${months[to.getMonth()]} ${to.getFullYear()}`;
+
+                let fromYear = from.getFullYear();
+                let toYear = to.getFullYear();
+
+                const months = [
+                    "January", "February", "March", "April", "May", "June",
+                    "July", "August", "September", "October", "November", "December"
+                ];
+
+                const fromDay = from.getDate();
+                const fromMonth = months[from.getMonth()];
+                const toDay = to.getDate();
+                const toMonth = months[to.getMonth()];
+
+                if (visit.from === visit.to) {
+                    textLabel = `${fromDay} ${fromMonth}, ${toYear}`;
+                } else if (fromMonth === toMonth && fromYear === toYear) {
+                    textLabel = `${fromDay} - ${toDay} ${fromMonth}, ${fromYear}`;
+                } else if (fromYear === toYear) {
+                    textLabel = `${fromDay} ${fromMonth} - ${toDay} ${toMonth}, ${toYear}`;
+                } else {
+                    textLabel = `${fromDay} ${fromMonth}, ${fromYear} - ${toDay} ${toMonth}, ${toYear}`;
+                }
             } else {
                 textLabel = "Wishlisted";
             }
@@ -362,8 +406,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     function dateFromText(text) {
-        const [month, year] = text.split(" ");
-        return new Date(parseInt(year), months.indexOf(month));
+        const [day, month, year] = text.split(" ");
+        return new Date(parseInt(year), months.indexOf(month), parseInt(day));
     }
 
     // --- Event Listeners ---

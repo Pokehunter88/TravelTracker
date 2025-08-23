@@ -237,19 +237,28 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (visit.from && visit.to) {
             const from = new Date(visit.from);
             const to = new Date(visit.to);
-            const fromMonth = from.toLocaleString('default', { month: 'short' });
-            const toMonth = to.toLocaleString('default', { month: 'short' });
-            const fromYear = from.getFullYear();
-            const toYear = to.getFullYear();
 
-            if (fromYear === toYear) {
-                if (fromMonth === toMonth) {
-                    date.textContent = `${fromMonth}, ${toYear}`;
-                } else {
-                    date.textContent = `${fromMonth} - ${toMonth}, ${toYear}`;
-                }
+            let fromYear = from.getFullYear();
+            let toYear = to.getFullYear();
+
+            const months = [
+                "January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+            ];
+
+            const fromDay = from.getDate();
+            const fromMonth = months[from.getMonth()];
+            const toDay = to.getDate();
+            const toMonth = months[to.getMonth()];
+
+            if (visit.from === visit.to) {
+                date.textContent = `${fromDay} ${fromMonth}, ${toYear}`;
+            } else if (fromMonth === toMonth && fromYear === toYear) {
+                date.textContent = `${fromDay} - ${toDay} ${fromMonth}, ${fromYear}`;
+            } else if (fromYear === toYear) {
+                date.textContent = `${fromDay} ${fromMonth} - ${toDay} ${toMonth}, ${toYear}`;
             } else {
-                date.textContent = `${fromMonth} ${fromYear} - ${toMonth} ${toYear}`;
+                date.textContent = `${fromDay} ${fromMonth}, ${fromYear} - ${toDay} ${toMonth}, ${toYear}`;
             }
         } else {
             date.textContent = 'Visited';
