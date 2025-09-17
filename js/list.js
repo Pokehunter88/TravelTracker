@@ -1,14 +1,11 @@
 document.addEventListener("DOMContentLoaded", async () => {
     // --- DOM Elements ---
-    const slider = document.getElementById('main-tab-slider');
-    const countriesContent = document.getElementById('countries-content');
-    const citiesContent = document.getElementById('cities-content');
-    const regionsContent = document.getElementById('regions-content');
     const slider2 = document.getElementById('type-tab-slider');
     const visitContent = document.getElementById('visit-content');
     const wishlistContent = document.getElementById('wishlist-content');
     const searchInput = document.getElementById('search-input');
     const visitedOnlyCheckbox = document.getElementById('visited-countries-checkbox');
+    const wishlistedOnlyCheckbox = document.getElementById('wishlisted-countries-checkbox');
     const countryNameEl = document.getElementById('country-name');
     const countryCapitalEl = document.getElementById('country-capital');
     const countryCapital2El = document.getElementById('country-capital2');
@@ -35,6 +32,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     let layerRegion;
     let lastTimeout = null;
     let visitedCountries = [];
+    let wishlistedCountries = [];
 
     const months = [
         "January", "February", "March", "April", "May", "June",
@@ -46,7 +44,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         try {
             const url = new URL(window.location.href);
             const params = new URLSearchParams(url.search);
-
+          
             const tab = params.get("tab");
             const id = params.get("id");
 
@@ -64,16 +62,19 @@ document.addEventListener("DOMContentLoaded", async () => {
                         currency: columns[11],
                         name: countryName
                     });
-                    createItem(countryName, countryCode, columns[8].toLowerCase(), visitedCountries.includes(countryCode));
-
+                    createItem(countryName, countryCode, columns[8].toLowerCase(), visitedCountries.includes(countryCode), wishlistedCountries.includes(countryCode));
                     if (tab === "countries" && id === countryCode.toLowerCase() && layer) {
-                        setTimeout(() => openCountry(countryName, countryCode), 100);
+                        setTimeout(() => {
+                            openCountry(countryName, countryCode);
+
+                            document.getElementById("country-" + countryCode.toLowerCase()).scrollIntoView();
+                        }, 100);
                     } else if (tab === "countries" && id === countryCode.toLowerCase()) {
                         countryToOpen = [countryName, countryCode];
                     }
                 }
             });
-
+          
             const cities15000Response = await fetch('cities15000.txt', { cache: "force-cache" });
             const cities15000Text = await cities15000Response.text();
             cities15000Text.split('\n').forEach(line => {
@@ -126,33 +127,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     // --- UI & Tab Management ---
     function switchTab(tab) {
         const tabActions = {
-            'countries': () => {
-                slider.style.transform = 'translateX(0)';
-                countriesContent.classList.remove('hidden');
-                citiesContent.classList.add('hidden');
-                regionsContent.classList.add('hidden');
-            },
-            'cities': () => {
-                slider.style.transform = 'translateX(100%)';
-                countriesContent.classList.add('hidden');
-                citiesContent.classList.remove('hidden');
-                regionsContent.classList.add('hidden');
-            },
-            'regions': () => {
-                slider.style.transform = 'translateX(200%)';
-                countriesContent.classList.add('hidden');
-                citiesContent.classList.add('hidden');
-                regionsContent.classList.remove('hidden');
-            },
             'visit': () => {
                 slider2.style.transform = 'translateX(0)';
                 visitContent.classList.remove('hidden');
                 wishlistContent.classList.add('hidden');
+
+                createVisitList(modalCountryName.textContent, modalCountryName.name);
             },
             'wishlist': () => {
                 slider2.style.transform = 'translateX(100%)';
                 visitContent.classList.add('hidden');
                 wishlistContent.classList.remove('hidden');
+
+                createWishlistList(modalCountryName.textContent, modalCountryName.name);
             }
         };
 
@@ -171,6 +158,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     function search() {
         const filter = searchInput.value.toUpperCase();
         const visitedOnly = visitedOnlyCheckbox.checked;
+        const wishlistedOnly = wishlistedOnlyCheckbox.checked;
 
         if (currentTab === "countries") {
             const lists = document.querySelectorAll('#af, #an, #as, #eu, #na, #oc, #sa');
@@ -181,7 +169,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                     const p = items[i].getElementsByTagName('p')[0];
                     const txtValue = p.textContent || p.innerText;
                     const isVisited = visitedCountries.includes(items[i].id.replace("country-", ""));
-                    if (txtValue.toUpperCase().indexOf(filter) > -1 && (!visitedOnly || isVisited)) {
+                    const isWishlisted = wishlistedCountries.includes(items[i].id.replace("country-", ""));
+                    if (txtValue.toUpperCase().indexOf(filter) > -1 && (visitedOnly ? (wishlistedOnly ? isVisited || isWishlisted : isVisited) : (wishlistedOnly ? isWishlisted : true))) {
                         items[i].style.display = "";
                         visibleItems++;
                     } else {
@@ -193,42 +182,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                     title.style.display = visibleItems > 0 ? "" : "none";
                 }
             });
-        } else if (currentTab === "cities") {
-            const list = document.getElementById('cities');
-            const items = list.getElementsByTagName('label');
-            for (let i = 0; i < items.length; i++) {
-                const p = items[i].getElementsByTagName('p')[0];
-                const txtValue = p.textContent || p.innerText;
-                items[i].style.display = txtValue.toUpperCase().indexOf(filter) > -1 ? "" : "none";
-            }
-        } else if (currentTab === "regions") {
-            const list = document.getElementById('regions');
-            const items = list.getElementsByTagName('label');
-            for (let i = 0; i < items.length; i++) {
-                const elements = items[i].getElementsByTagName('p');
-                const p = elements[0];
-                const p2 = elements[1];
-                const txtValue = p.textContent || p.innerText;
-                const txtValue2 = p2.textContent || p2.innerText;
-
-                if (filter.includes(":")) {
-                    const split = filter.split(":");
-                    const part1 = split[0];
-                    const part2 = split[1][0] === " " ? split[1].substring(1) : split[1];
-
-                    items[i].style.display = txtValue.toUpperCase().indexOf(part2) > -1 & txtValue2.toUpperCase().indexOf(part1) > -1 ? "" : "none";
-                } else {
-                    items[i].style.display = txtValue.toUpperCase().indexOf(filter) > -1 || txtValue2.toUpperCase().indexOf(filter) > -1 ? "" : "none";
-                }
-            }
         }
     }
     window.search = search;
 
     // --- Item Creation ---
-    function createItem(name, flag, continent, visited) {
+    function createItem(name, flag, continent, visited, wishlisted) {
         const newNode = document.createElement("label");
-        newNode.className = `flex justify-between items-center cursor-pointer rounded-lg px-3 py-3 transition-colors ${visited ? 'bg-[#2b7fff4f] hover:bg-[#1447e64f]' : 'hover:bg-[#2e363e]'}`;
+        newNode.className = `flex justify-between items-center cursor-pointer rounded-lg px-3 py-3 transition-colors ${visited ? (wishlisted ? 'bg-[var(--mix-color)] hover:bg-[var(--mix-hover-color)]' : 'bg-[var(--visit-color)] hover:bg-[var(--visit-hover-color)]') : (wishlisted ? 'bg-[var(--wishlist-color)] hover:bg-[var(--wishlist-hover-color)]' : 'hover:bg-[#2e363e]')}`;
         newNode.id = "country-" + flag;
 
         const leftContainer = document.createElement("div");
@@ -323,7 +284,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     function loadCountries() {
-        fetch('/ne_50m_admin_0_countries.geojson', { cache: "force-cache" })
+        fetch('ne_50m_admin_0_countries.geojson', { cache: "force-cache" })
             .then(res => res.json())
             .then(data => {
                 if (layer) map.removeLayer(layer);
@@ -334,7 +295,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                     element.style.transition = "max-width 0.5s ease-in-out, left 0.5s ease-in-out";
                 }, 1);
                 if (countryToOpen) {
-                    setTimeout(() => openCountry(countryToOpen[0], countryToOpen[1]), 100);
+                    setTimeout(() => {
+                        openCountry(countryToOpen[0], countryToOpen[1])
+
+                        document.getElementById("country-" + countryToOpen[1]).scrollIntoView();
+                    }, 100);
                 }
             });
     }
@@ -482,15 +447,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         checkmarkEl.classList.toggle("opacity-0", !isVisited);
     }
 
-    // --- Modal Logic ---
-    function openModal(countryName, countryCode) {
-        switchTab('visit');
-        modalCountryName.textContent = countryName;
-        modalCountryName.name = countryCode;
+    function createVisitList(countryName, countryCode) {
         visitsList.innerHTML = '';
 
         const saveData = getSaveData();
         const countryVisits = saveData.countryVisits.filter(visit => visit.country === countryCode);
+        const countryWishlists = saveData.countryWishlists.filter(visit => visit.country === countryCode);
 
         countryVisits.forEach(visit => {
             const listItem = document.createElement('li');
@@ -499,7 +461,29 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (visit.from && visit.to) {
                 const from = new Date(visit.from);
                 const to = new Date(visit.to);
-                textLabel = `${months[from.getMonth()]} ${from.getFullYear() === to.getFullYear() ? '' : from.getFullYear()} > ${months[to.getMonth()]} ${to.getFullYear()}`;
+
+                let fromYear = from.getFullYear();
+                let toYear = to.getFullYear();
+
+                const months = [
+                    "January", "February", "March", "April", "May", "June",
+                    "July", "August", "September", "October", "November", "December"
+                ];
+
+                const fromDay = from.getDate();
+                const fromMonth = months[from.getMonth()];
+                const toDay = to.getDate();
+                const toMonth = months[to.getMonth()];
+
+                if (visit.from === visit.to) {
+                    textLabel = `${fromDay} ${fromMonth}, ${toYear}`;
+                } else if (fromMonth === toMonth && fromYear === toYear) {
+                    textLabel = `${fromDay} - ${toDay} ${fromMonth}, ${fromYear}`;
+                } else if (fromYear === toYear) {
+                    textLabel = `${fromDay} ${fromMonth} - ${toDay} ${toMonth}, ${toYear}`;
+                } else {
+                    textLabel = `${fromDay} ${fromMonth}, ${fromYear} - ${toDay} ${toMonth}, ${toYear}`;
+                }
             } else {
                 textLabel = "Visited";
             }
@@ -511,7 +495,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             removeButton.onclick = () => {
                 saveData.countryVisits.splice(saveData.countryVisits.indexOf(visit), 1);
                 if (saveData.countryVisits.filter(v => v.country === countryCode).length === 0) {
-                    document.getElementById(`country-${countryCode}`).className = "flex cursor-pointer items-center gap-x-3 rounded-lg px-3 py-3 transition-colors hover:bg-[#2e363e]";
+                    document.getElementById(`country-${countryCode}`).className = `flex cursor-pointer items-center gap-x-3 rounded-lg px-3 py-3 transition-colors ${countryWishlists.length > 0 ? "bg-[var(--wishlist-color)] hover:bg-[var(--wishlist-hover-color)]" : "hover:bg-[#2e363e]"}`;
                 }
                 localStorage.setItem('saveData', JSON.stringify(saveData));
                 openModal(countryName, countryCode);
@@ -520,6 +504,74 @@ document.addEventListener("DOMContentLoaded", async () => {
             listItem.appendChild(removeButton);
             visitsList.appendChild(listItem);
         });
+    }
+
+    function createWishlistList(countryName, countryCode) {
+        visitsList.innerHTML = '';
+
+        const saveData = getSaveData();
+        const countryVisits = saveData.countryVisits.filter(visit => visit.country === countryCode);
+        const countryWishlists = saveData.countryWishlists.filter(visit => visit.country === countryCode);
+
+        countryWishlists.forEach(visit => {
+            const listItem = document.createElement('li');
+            listItem.className = 'flex justify-between items-center p-2 border-b border-gray-700 font-bold';
+            let textLabel;
+            if (visit.from && visit.to) {
+                const from = new Date(visit.from);
+                const to = new Date(visit.to);
+
+                let fromYear = from.getFullYear();
+                let toYear = to.getFullYear();
+
+                const months = [
+                    "January", "February", "March", "April", "May", "June",
+                    "July", "August", "September", "October", "November", "December"
+                ];
+
+                const fromDay = from.getDate();
+                const fromMonth = months[from.getMonth()];
+                const toDay = to.getDate();
+                const toMonth = months[to.getMonth()];
+
+                if (visit.from === visit.to) {
+                    textLabel = `${fromDay} ${fromMonth}, ${toYear}`;
+                } else if (fromMonth === toMonth && fromYear === toYear) {
+                    textLabel = `${fromDay} - ${toDay} ${fromMonth}, ${fromYear}`;
+                } else if (fromYear === toYear) {
+                    textLabel = `${fromDay} ${fromMonth} - ${toDay} ${toMonth}, ${toYear}`;
+                } else {
+                    textLabel = `${fromDay} ${fromMonth}, ${fromYear} - ${toDay} ${toMonth}, ${toYear}`;
+                }
+            } else {
+                textLabel = "Wishlisted";
+            }
+            listItem.appendChild(document.createTextNode(textLabel));
+
+            const removeButton = document.createElement('button');
+            removeButton.textContent = 'Remove';
+            removeButton.className = 'ml-4 bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded transition-all duration-300 ease-in-out transform hover:scale-105';
+            removeButton.onclick = () => {
+                saveData.countryWishlists.splice(saveData.countryWishlists.indexOf(visit), 1);
+                if (saveData.countryWishlists.filter(v => v.country === countryCode).length === 0) {
+                    document.getElementById(`country-${countryCode}`).className = `flex cursor-pointer items-center gap-x-3 rounded-lg px-3 py-3 transition-colors ${countryVisits.length > 0 ? "bg-[var(--visit-color)] hover:bg-[var(--visit-hover-color)]" : "hover:bg-[#2e363e]"}`;
+                }
+                localStorage.setItem('saveData', JSON.stringify(saveData));
+
+                createWishlistList(countryName, countryCode);
+            };
+            listItem.appendChild(removeButton);
+            visitsList.appendChild(listItem);
+        });
+    }
+
+    // --- Modal Logic ---
+    function openModal(countryName, countryCode) {
+        switchTab('visit');
+        modalCountryName.textContent = countryName;
+        modalCountryName.name = countryCode;
+
+        createVisitList(countryName, countryCode);
 
         fromButton.textContent = "From";
         toButton.textContent = "To";
@@ -533,20 +585,30 @@ document.addEventListener("DOMContentLoaded", async () => {
     // --- Data Persistence ---
     function getSaveData() {
         try {
-            return JSON.parse(localStorage.getItem("saveData")) || { countryVisits: [], countryWishlist: {} };
+            const saveData = JSON.parse(localStorage.getItem("saveData") ?? { countryVisits: [], countryWishlists: [] });
+
+            if (saveData.countryVisits === undefined) {
+                saveData.countryVisits = [];
+            }
+            if (saveData.countryWishlists === undefined) {
+                saveData.countryWishlists = [];
+            }
+
+            return saveData;
         } catch (e) {
-            return { countryVisits: [], countryWishlist: {} };
+            return { countryVisits: [], countryWishlists: [] };
         }
     }
 
     function getCountries() {
         const saveData = getSaveData();
         visitedCountries = saveData.countryVisits.map(visit => visit.country);
+        wishlistedCountries = saveData.countryWishlists.map(visit => visit.country);
     }
 
     function dateFromText(text) {
-        const [month, year] = text.split(" ");
-        return new Date(parseInt(year), months.indexOf(month));
+        const [day, month, year] = text.split(" ");
+        return new Date(parseInt(year), months.indexOf(month), parseInt(day));
     }
 
     // --- Event Listeners ---
@@ -565,7 +627,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         saveData.countryVisits.push({ country: modalCountryName.name, from: fromValue, to: toValue });
         localStorage.setItem("saveData", JSON.stringify(saveData));
-        document.getElementById(`country-${modalCountryName.name}`).className = "flex cursor-pointer items-center gap-x-3 rounded-lg px-3 py-3 transition-colors bg-[#2b7fff4f] hover:bg-[#1447e64f]";
+
+        const countryWishlists = saveData.countryWishlists.filter(visit => visit.country === modalCountryName.name);
+
+        document.getElementById(`country-${modalCountryName.name}`).className = `flex cursor-pointer items-center gap-x-3 rounded-lg px-3 py-3 transition-colors ${countryWishlists.length > 0 ? "bg-[var(--mix-color)] hover:bg-[var(--mix-hover-color)]" : "bg-[var(--visit-color)] hover:bg-[var(--visit-hover-color)]"}`;
         openModal(modalCountryName.textContent, modalCountryName.name);
         getCountries();
         updateCheckmark(modalCountryName.name);
@@ -575,14 +640,42 @@ document.addEventListener("DOMContentLoaded", async () => {
         openModal(countryNameEl.textContent, countryNameEl.name);
     });
 
+    document.getElementById('add-to-wishlist').addEventListener('click', () => {
+        const saveData = getSaveData();
+        const from = fromButton.textContent;
+        const to = toButton.textContent;
+        let fromValue = null;
+        let toValue = null;
 
+        if (from !== "From" && to !== "To") {
+            fromValue = dateFromText(from).getTime();
+            toValue = dateFromText(to).getTime();
+        }
 
-    visitedOnlyCheckbox.addEventListener('change', search);
+        saveData.countryWishlists.push({ country: modalCountryName.name, from: fromValue, to: toValue });
+        localStorage.setItem("saveData", JSON.stringify(saveData));
+
+        const countryVisits = saveData.countryVisits.filter(visit => visit.country === modalCountryName.name);
+
+        document.getElementById(`country-${modalCountryName.name}`).className = `flex cursor-pointer items-center gap-x-3 rounded-lg px-3 py-3 transition-colors ${countryVisits.length > 0 ? "bg-[var(--mix-color)] hover:bg-[var(--mix-hover-color)]" : "bg-[var(--wishlist-color)] hover:bg-[var(--wishlist-hover-color)]"}`;
+
+        fromButton.textContent = "From";
+        toButton.textContent = "To";
+        createWishlistList(modalCountryName.textContent, modalCountryName.name);
+        getCountries();
+    });
+
+    visitedOnlyCheckbox.addEventListener('change', () => {
+        wishlistedOnlyCheckbox.checked = false;
+        search();
+    });
+    wishlistedOnlyCheckbox.addEventListener('change', () => {
+        visitedOnlyCheckbox.checked = false;
+        search();
+    });
 
     // --- Initialization ---
     initializeMap();
     getCountries();
     await loadData();
-
-    // switchTab('regions');
 });
