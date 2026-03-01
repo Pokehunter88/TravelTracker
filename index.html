@@ -85,7 +85,7 @@
                 </div>
             </header>
             <div class="flex flex-1 justify-center py-5">
-                <div class="layout-content-container flex flex-col flex-1">
+                <div class="layout-content-container flex flex-col flex-1 relative">
                     <div
                         class="tracking-[-0.015em] px-4 pb-2 pt-4 place-self-center border-b border-t border-t-[#2e363e] border-solid border-b-[#2e363e] flex">
                         <div class="px-4">
@@ -102,39 +102,63 @@
                     </div>
                     <div id="map" class="h-full bg-[#161a1d]"></div>
 
+                    <!-- Country info popup -->
+                    <div id="country-popup" style="display:none; position:absolute; bottom:20px; left:20px; z-index:1000; background:#1e262d; border:1px solid #2e363e; border-radius:10px; padding:16px; width:268px; box-shadow:0 4px 24px #00000066; font-family:inherit;">
+                        <button id="popup-close" style="position:absolute; top:10px; right:12px; background:none; border:none; color:#9ca3af; font-size:22px; cursor:pointer; line-height:1; padding:0;">&times;</button>
+                        <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+                            <img id="popup-flag" src="" alt="" style="width:52px; height:auto; border-radius:4px; border:1px solid #2e363e; flex-shrink:0;">
+                            <div>
+                                <div id="popup-name" style="color:white; font-size:16px; font-weight:700; line-height:1.2;"></div>
+                                <div id="popup-status" style="display:none; font-size:11px; font-weight:600; padding:2px 8px; border-radius:4px; margin-top:5px; display:inline-block;"></div>
+                            </div>
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:7px; border-top:1px solid #2e363e; padding-top:10px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span style="color:#6b7280; font-size:13px;">Capital</span>
+                                <span id="popup-capital" style="color:white; font-size:13px; text-align:right; max-width:160px;"></span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span style="color:#6b7280; font-size:13px;">Population</span>
+                                <span id="popup-population" style="color:white; font-size:13px;"></span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span style="color:#6b7280; font-size:13px;">Currency</span>
+                                <span id="popup-currency" style="color:white; font-size:13px;"></span>
+                            </div>
+                        </div>
+                    </div>
+
                     <script>
                         function getSaveData() {
                             try {
                                 const saveData = JSON.parse(localStorage.getItem("saveData") ?? { countryVisits: [], countryWishlists: [] });
-
-                                if (saveData.countryVisits === undefined) {
-                                    saveData.countryVisits = [];
-                                }
-                                if (saveData.countryWishlists === undefined) {
-                                    saveData.countryWishlists = [];
-                                }
-
+                                if (saveData.countryVisits === undefined) saveData.countryVisits = [];
+                                if (saveData.countryWishlists === undefined) saveData.countryWishlists = [];
                                 return saveData;
                             } catch (e) {
                                 return { countryVisits: [], countryWishlists: [] };
                             }
                         }
 
-                        // Example visited countries using ISO Alpha-2 codes
-                        const visitedCountries = []; // ← change as needed
-
+                        const visitedCountries = [];
+                        const wishlistedCountries = [];
                         const saveData = getSaveData();
 
-                        for (let i = 0; i < saveData.countryVisits.length; i++) {
-                            if (!visitedCountries.includes(saveData.countryVisits[i].country.toUpperCase())) {
-                                visitedCountries.push(saveData.countryVisits[i].country.toUpperCase());
-                            }
+                        for (const v of saveData.countryVisits) {
+                            if (!visitedCountries.includes(v.country.toUpperCase()))
+                                visitedCountries.push(v.country.toUpperCase());
+                        }
+                        for (const w of saveData.countryWishlists) {
+                            if (!wishlistedCountries.includes(w.country.toUpperCase()))
+                                wishlistedCountries.push(w.country.toUpperCase());
                         }
 
                         document.getElementById('visited-count').innerText = visitedCountries.length + "/197";
                         document.getElementById('world-count').innerText = Math.ceil((visitedCountries.length / 197) * 100) + "%";
 
-                        // Style function: color visited countries green, others gray
+                        // Country info loaded from countryInfo.txt
+                        const countryInfoMap = new Map();
+
                         function countryStyle(feature) {
                             const isoCode = feature.properties["ISO_A2_EH"];
                             return {
@@ -148,24 +172,42 @@
                         function onEachCountry(feature, layer) {
                             layer.on({
                                 mouseover: (e) => {
-                                    const layer = e.target;
-                                    layer.setStyle({
-                                        fillColor: '#FFFFFF',
-                                        color: '#FFFFFF',
-                                    });
-                                    // You now know which country is hovered:
-                                    console.log('Hovering over:', feature.properties.ADMIN);
+                                    e.target.setStyle({ fillColor: '#FFFFFF', color: '#FFFFFF' });
                                 },
                                 mouseout: (e) => {
-                                    const isoCode = feature.properties["ISO3166-1-Alpha-2"];
-                                    const layer = e.target;
-                                    layer.setStyle({
+                                    const isoCode = feature.properties["ISO_A2_EH"];
+                                    e.target.setStyle({
                                         fillColor: visitedCountries.includes(isoCode) ? '#FFFFFF' : '#2e363e',
                                         color: visitedCountries.includes(isoCode) ? '#FFFFFF' : '#2e363e',
                                     });
                                 },
                                 click: (e) => {
-                                    // optional: click to toggle visited
+                                    L.DomEvent.stopPropagation(e);
+                                    const isoCode = feature.properties["ISO_A2_EH"];
+                                    const info = countryInfoMap.get(isoCode.toLowerCase());
+                                    if (!info) return;
+
+                                    document.getElementById('popup-flag').src = `https://flagcdn.com/${isoCode.toLowerCase()}.svg`;
+                                    document.getElementById('popup-name').textContent = info.name;
+                                    document.getElementById('popup-capital').textContent = info.capital || '—';
+                                    document.getElementById('popup-population').textContent =
+                                        info.population ? parseInt(info.population).toLocaleString() : '—';
+                                    document.getElementById('popup-currency').textContent = info.currency || '—';
+
+                                    const isVisited = visitedCountries.includes(isoCode);
+                                    const isWishlisted = wishlistedCountries.includes(isoCode);
+                                    const statusEl = document.getElementById('popup-status');
+                                    if (isVisited || isWishlisted) {
+                                        statusEl.style.display = 'inline-block';
+                                        statusEl.textContent = isVisited ? 'Visited' : 'Wishlisted';
+                                        statusEl.style.background = isVisited ? '#2fff2b1a' : '#2b7fff1a';
+                                        statusEl.style.color = isVisited ? '#2fff2b' : '#2b7fff';
+                                        statusEl.style.border = `1px solid ${isVisited ? '#2fff2b' : '#2b7fff'}`;
+                                    } else {
+                                        statusEl.style.display = 'none';
+                                    }
+
+                                    document.getElementById('country-popup').style.display = 'block';
                                 }
                             });
                         }
@@ -173,25 +215,45 @@
                         // Create Leaflet map
                         const map = L.map('map', {
                             zoomControl: false,
-                            // dragging: false,
-                            // touchZoom: false,
                             doubleClickZoom: false,
-                            // scrollWheelZoom: false,
                             boxZoom: false,
                             keyboard: false,
                             tap: false,
                             attributionControl: false
                         }).setView([0, 0], 1);
 
-                        // Load country GeoJSON data
-                        fetch('ne_50m_admin_0_countries.geojson', { cache: "force-cache" })
-                            .then(res => res.json())
-                            .then(data => {
-                                L.geoJSON(data, {
-                                    style: countryStyle,
-                                    // onEachFeature: onEachCountry
-                                }).addTo(map);
+                        map.on('click', () => {
+                            document.getElementById('country-popup').style.display = 'none';
+                        });
+
+                        document.getElementById('popup-close').addEventListener('click', () => {
+                            document.getElementById('country-popup').style.display = 'none';
+                        });
+
+                        // Load country info then GeoJSON
+                        (async () => {
+                            const infoRes = await fetch('datasets/countryInfo.txt', { cache: 'force-cache' });
+                            const infoText = await infoRes.text();
+                            infoText.split('\n').forEach(line => {
+                                if (line.startsWith('#') || line.trim() === '') return;
+                                const cols = line.split('\t');
+                                if (cols.length > 11) {
+                                    countryInfoMap.set(cols[0].toLowerCase(), {
+                                        name: cols[4],
+                                        capital: cols[5],
+                                        population: cols[7],
+                                        currency: cols[11]
+                                    });
+                                }
                             });
+
+                            const geoRes = await fetch('ne_50m_admin_0_countries.geojson', { cache: 'force-cache' });
+                            const geoData = await geoRes.json();
+                            L.geoJSON(geoData, {
+                                style: countryStyle,
+                                onEachFeature: onEachCountry
+                            }).addTo(map);
+                        })();
                     </script>
                 </div>
             </div>

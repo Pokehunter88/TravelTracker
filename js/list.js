@@ -9,8 +9,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     const countryNameEl = document.getElementById('country-name');
     const countryCapitalEl = document.getElementById('country-capital');
     const countryCapital2El = document.getElementById('country-capital2');
+    const regionCountryEl = document.getElementById('region-country');
     const countryPopulationEl = document.getElementById('country-population');
     const countryCurrencyEl = document.getElementById('country-currency');
+    const aboutCapitalEl = document.getElementById('about-capital');
+    const aboutCountryEl = document.getElementById('about-country');
+    const aboutPopulationEl = document.getElementById('about-population');
     const checkmarkEl = document.getElementById('checkmark');
     const modal = document.getElementById('country-modal');
     const modalCountryName = document.getElementById('modal-country-name');
@@ -25,6 +29,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     let map;
     let currentCountry = "";
     let layer;
+    let layerRegion;
     let lastTimeout = null;
     let visitedCountries = [];
     let wishlistedCountries = [];
@@ -38,7 +43,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     async function loadData() {
         try {
             const url = new URL(window.location.href);
-            const id = url.hash.replace(/^#/, '');
+            const params = new URLSearchParams(url.search);
+          
+            const tab = params.get("tab");
+            const id = params.get("id");
 
             const countryInfoResponse = await fetch('datasets/countryInfo.txt', { cache: "force-cache" });
             const countryInfoText = await countryInfoResponse.text();
@@ -55,12 +63,59 @@ document.addEventListener("DOMContentLoaded", async () => {
                         name: countryName
                     });
                     createItem(countryName, countryCode, columns[8].toLowerCase(), visitedCountries.includes(countryCode), wishlistedCountries.includes(countryCode));
-                    if (id === countryCode.toLowerCase() && layer) {
+                    if (tab === "countries" && id === countryCode.toLowerCase() && layer) {
                         setTimeout(() => {
                             openCountry(countryName, countryCode);
 
                             document.getElementById("country-" + countryCode.toLowerCase()).scrollIntoView();
                         }, 100);
+                    } else if (tab === "countries" && id === countryCode.toLowerCase()) {
+                        countryToOpen = [countryName, countryCode];
+                    }
+                }
+            });
+          
+            const cities15000Response = await fetch('cities15000.txt', { cache: "force-cache" });
+            const cities15000Text = await cities15000Response.text();
+            cities15000Text.split('\n').forEach(line => {
+                if (line.startsWith('#') || line.trim() === '') return;
+                const columns = line.split('\t');
+                if (columns.length > 4) {
+                    const cityName = columns[2];
+                    const cityName2 = columns[1];
+                    const countryCode = columns[8];
+                    if (countryCode === "FR") {
+                        createItemCity(cityName, cityName2, countryCode, false);
+                    }
+                }
+            });
+
+            const regionsResponse = await fetch('ne_50m_admin_1_states_provinces.geojson', { cache: "force-cache" });
+            const regionsData = await regionsResponse.json();
+
+            layerRegion = L.geoJSON(regionsData, {
+                style: () => {
+                    return {
+                        fillColor: '#FFFFFF00',
+                        weight: 3,
+                        color: '#FFFFFF00',
+                        fillOpacity: 1
+                    };
+                }
+            }).addTo(map);
+
+            regionsData.features.forEach(feature => {
+                const visited = false;
+
+                const regionName = feature.properties.name;
+                const countryCode = feature.properties.iso_a2;
+                createItemRegion(regionName, feature.properties.code_hasc, countryInfoMap.get(countryCode.toLowerCase()).currency, countryInfoMap.get(countryCode.toLowerCase()).name, visited);
+
+                if (tab === "regions") {
+                    switchTab("regions");
+
+                    if (id.toLowerCase() === feature.properties.code_hasc.toLowerCase() && layer) {
+                        setTimeout(() => openRegion(regionName, feature.properties.code_hasc, countryInfoMap.get(countryCode.toLowerCase()).currency, countryInfoMap.get(countryCode.toLowerCase()).name, visited), 100);
                     } else if (id === countryCode.toLowerCase()) {
                         countryToOpen = [countryName, countryCode];
                     }
@@ -154,6 +209,60 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.getElementById(continent).append(newNode);
     }
 
+    function createItemCity(name, secondName, country, visited) {
+        const newNode = document.createElement("label");
+        newNode.className = `flex justify-between items-center cursor-pointer rounded-lg px-3 py-3 transition-colors ${visited ? 'bg-[#00FF0036] hover:bg-[#00FF0083]' : 'hover:bg-[#2e363e]'}`;
+        newNode.id = "city-" + name;
+        newNode.classList.add("city-" + country);
+
+        const leftContainer = document.createElement("div");
+        leftContainer.className = "flex flex-row items-center gap-x-3";
+
+        const text = document.createElement("p");
+        text.className = "text-white text-base font-normal leading-normal peer-checked:text-[#dbe5ef]";
+        text.textContent = name;
+
+        const text2 = document.createElement("p");
+        text2.className = "text-gray-500 text-base font-normal leading-normal peer-checked:text-[#dbe5ef]";
+        text2.textContent = secondName;
+
+        leftContainer.append(text);
+        newNode.append(leftContainer, text2);
+        newNode.addEventListener('click', () => { /* openModal(name, flag); openCountry(name, flag); */ });
+        document.getElementById("cities").append(newNode);
+    }
+
+    function createItemRegion(name, id, currency, country, visited) {
+        const newNode = document.createElement("label");
+        newNode.className = `flex justify-between items-center cursor-pointer rounded-lg p-2 transition-colors ${visited ? 'bg-[#00FF0036] hover:bg-[#00FF0083]' : 'hover:bg-[#2e363e]'}`;
+        newNode.id = "region-" + name;
+        newNode.classList.add("region-" + country.replaceAll(" ", "-"));
+
+        const leftContainer = document.createElement("div");
+        leftContainer.className = "flex flex-row items-center gap-x-3";
+
+        const text = document.createElement("p");
+        text.className = "text-white text-base font-normal leading-normal peer-checked:text-[#dbe5ef]";
+        text.textContent = name;
+
+        const text2 = document.createElement("p");
+        text2.className = "text-gray-500 text-base font-normal leading-normal peer-checked:text-[#dbe5ef] hover:bg-[#FFFFFF10] underline py-1 px-3 transition rounded";
+        text2.name = "Country";
+        text2.textContent = country;
+
+        leftContainer.append(text);
+        newNode.append(leftContainer, text2);
+        newNode.addEventListener('click', (e) => {
+            if (e.target.name === "Country") {
+                searchInput.value = country + ": ";
+                search();
+            } else {
+                openRegion(name, id, currency, country, visited);
+            }
+        });
+        document.getElementById("regions").append(newNode);
+    }
+
     // --- Map Logic ---
     function initializeMap() {
         map = L.map('map', {
@@ -200,7 +309,16 @@ document.addEventListener("DOMContentLoaded", async () => {
             closeCountry();
         } else {
             document.querySelector(':root').style.setProperty('--container-width', '960px');
-            window.location.hash = flag;
+
+            const url = new URL(window.location.href);
+            const params = new URLSearchParams(url.search);
+
+            params.set('tab', 'countries');
+            params.set('id', flag);
+
+            url.search = params.toString();
+            window.history.pushState({}, '', url);
+
             countryNameEl.textContent = name;
             countryNameEl.name = flag;
             updateCheckmark(flag);
@@ -212,6 +330,21 @@ document.addEventListener("DOMContentLoaded", async () => {
             countryPopulationEl.textContent = Number(countryData.population).toLocaleString();
             countryCurrencyEl.textContent = countryData.currency;
 
+            aboutCapitalEl.classList.remove("hidden");
+            aboutPopulationEl.classList.remove("hidden");
+            aboutCountryEl.classList.add("hidden");
+
+            if (layerRegion) {
+                layerRegion.eachLayer(function (currentLayer) {
+                    currentLayer.setStyle({
+                        fillColor: '#2e363e',
+                        weight: 3,
+                        color: '#2e363e',
+                        fillOpacity: 1
+                    });
+                });
+            }
+
             let layerBounds = null;
             layer.eachLayer(function (currentLayer) {
                 const options = countryStyle(currentLayer.feature);
@@ -222,6 +355,74 @@ document.addEventListener("DOMContentLoaded", async () => {
                     layerBounds = currentLayer.getBounds();
 
                     map.fitBounds(layerBounds, true);
+                }
+            });
+
+            if (lastTimeout) clearTimeout(lastTimeout);
+            lastTimeout = setTimeout(() => {
+                map.invalidateSize();
+                if (layerBounds) map.fitBounds(layerBounds, true);
+            }, 500);
+        }
+    }
+
+    function openRegion(name, id, currency, country, visited) {
+        if (countryNameEl.textContent === name && document.querySelector(':root').style.getPropertyValue('--container-width') === "960px") {
+            closeCountry();
+        } else {
+            document.querySelector(':root').style.setProperty('--container-width', '960px');
+
+            const url = new URL(window.location.href);
+            const params = new URLSearchParams(url.search);
+
+            params.set('tab', 'regions');
+            params.set('id', id);
+
+            url.search = params.toString();
+            window.history.pushState({}, '', url);
+
+
+            countryNameEl.textContent = name;
+            countryCapitalEl.textContent = country;
+
+            regionCountryEl.textContent = country;
+            countryCurrencyEl.textContent = currency;
+
+            aboutCapitalEl.classList.add("hidden");
+            aboutPopulationEl.classList.add("hidden");
+            aboutCountryEl.classList.remove("hidden");
+
+            checkmarkEl.classList.toggle("opacity-100", visited);
+            checkmarkEl.classList.toggle("opacity-0", !visited);
+
+            layer.eachLayer(function (currentLayer) {
+                currentLayer.setStyle({
+                    fillColor: '#2e363e',
+                    weight: 3,
+                    color: '#2e363e',
+                    fillOpacity: 1
+                });
+            });
+
+            let layerBounds = null;
+            layerRegion.eachLayer(function (currentLayer) {
+                if (currentLayer.feature.properties.name === name) {
+                    currentLayer.setStyle({
+                        fillColor: '#FFFFFF',
+                        weight: 3,
+                        color: '#FFFFFF',
+                        fillOpacity: 1
+                    });
+
+                    layerBounds = currentLayer.getBounds();
+                    map.fitBounds(layerBounds, true);
+                } else {
+                    currentLayer.setStyle({
+                        fillColor: '#FFFFFF00',
+                        weight: 3,
+                        color: '#FFFFFF00',
+                        fillOpacity: 1
+                    });
                 }
             });
 
